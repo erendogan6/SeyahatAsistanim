@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
+    id 'kotlin-kapt'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -47,6 +50,42 @@ android {
 }
 
 dependencies {
+
+    //Dependency Injection - Koin
+    implementation (libs.koin.android)
+
+    // Retrofit and OkHttp
+    implementation libs.retrofit
+    implementation libs.okhttp
+    implementation libs.converter.gson
+    implementation libs.loggingInterceptor
+
+    // Room Database
+    implementation libs.androidx.room.runtime
+    annotationProcessor(libs.androidx.room.compiler)
+    kapt libs.androidx.room.compiler
+
+    // Coroutine
+    implementation libs.kotlinx.coroutines.android
+
+    // Firebase
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.analytics.ktx
+    implementation libs.firebase.crashlytics.ktx
+    implementation libs.firebase.messaging.ktx
+
+    // JSON Parsing
+    implementation libs.google.gson
+
+    // Lottie
+    implementation libs.lottie.compose
+
+    // Chucker
+    debugImplementation libs.library
+    releaseImplementation libs.library.no.op
+
+    // LeakCanary
+    debugImplementation libs.leakcanary.android
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime.ktx
