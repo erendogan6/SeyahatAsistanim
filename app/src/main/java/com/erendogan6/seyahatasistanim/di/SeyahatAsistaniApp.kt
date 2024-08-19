@@ -13,6 +13,7 @@ class SeyahatAsistaniApp : Application() {
                 listOf(
                     networkModule,
                     viewModelModule,
+                    databaseModule,
                 ),
             )
         }
