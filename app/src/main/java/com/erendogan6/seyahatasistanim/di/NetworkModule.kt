@@ -18,22 +18,11 @@ val networkModule =
     module {
 
         single {
-            val apiKeyInterceptor = { chain: okhttp3.Interceptor.Chain ->
-                val original = chain.request()
-                val requestBuilder =
-                    original
-                        .newBuilder()
-                        .header("Authorization", "Bearer ${BuildConfig.OPENWEATHER_API_KEY}")
-                val request = requestBuilder.build()
-                chain.proceed(request)
-            }
-
             OkHttpClient
                 .Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
-                .addInterceptor(apiKeyInterceptor)
                 .addInterceptor(
                     HttpLoggingInterceptor().apply {
                         level = HttpLoggingInterceptor.Level.BODY
@@ -45,8 +34,19 @@ val networkModule =
             Retrofit
                 .Builder()
                 .baseUrl("https://pro.openweathermap.org/")
-                .client(get())
-                .addConverterFactory(GsonConverterFactory.create())
+                .client(
+                    get<OkHttpClient>()
+                        .newBuilder()
+                        .addInterceptor { chain ->
+                            val original = chain.request()
+                            val request =
+                                original
+                                    .newBuilder()
+                                    .header("Authorization", "Bearer ${BuildConfig.OPENWEATHER_API_KEY}")
+                                    .build()
+                            chain.proceed(request)
+                        }.build(),
+                ).addConverterFactory(GsonConverterFactory.create())
                 .build()
         }
 
@@ -55,8 +55,8 @@ val networkModule =
                 .Builder()
                 .baseUrl("https://api.openai.com/")
                 .client(
-                    OkHttpClient
-                        .Builder()
+                    get<OkHttpClient>()
+                        .newBuilder()
                         .addInterceptor { chain ->
                             val request =
                                 chain
@@ -65,8 +65,7 @@ val networkModule =
                                     .header("Authorization", "Bearer ${BuildConfig.CHATGPT_API_KEY}")
                                     .build()
                             chain.proceed(request)
-                        }.addInterceptor(get<OkHttpClient>().interceptors[0])
-                        .build(),
+                        }.build(),
                 ).addConverterFactory(GsonConverterFactory.create())
                 .build()
         }
@@ -80,11 +79,9 @@ val networkModule =
                 .build()
         }
 
-        single { get<Retrofit>().create(CityApiService::class.java) }
-
-        single { get<Retrofit>().create(WeatherApiService::class.java) }
-
-        single { get<Retrofit>().create(ChatGptApiService::class.java) }
+        single { get<Retrofit>(named("weatherRetrofit")).create(WeatherApiService::class.java) }
+        single { get<Retrofit>(named("chatGptRetrofit")).create(ChatGptApiService::class.java) }
+        single { get<Retrofit>(named("cityRetrofit")).create(CityApiService::class.java) }
 
         single {
             WeatherRepository(get())
