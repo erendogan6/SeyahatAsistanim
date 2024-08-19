@@ -34,11 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.erendogan6.seyahatasistanim.data.model.travel.TravelEntity
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
+import com.erendogan6.seyahatasistanim.utils.DateUtils
 import org.koin.androidx.compose.koinViewModel
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun travelInfoScreen(
@@ -249,18 +246,5 @@ fun travelMethodDropdown(
                 )
             }
         }
-    }
-}
-
-class DateUtils {
-    fun convertMillisToLocalDate(millis: Long): LocalDate =
-        Instant
-            .ofEpochMilli(millis)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
-
-    fun dateToString(date: LocalDate): String {
-        val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
-        return date.format(formatter)
     }
 }
