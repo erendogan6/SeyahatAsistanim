@@ -12,7 +12,10 @@ fun appNavigation(
     navController: NavHostController,
     modifier: Modifier,
 ) {
-    NavHost(navController, startDestination = "home", modifier = modifier) {
+    NavHost(navController, startDestination = "travelInfo", modifier = modifier) {
+        composable("travelInfo") {
+            travelInfoScreen(navController = navController)
+        }
         composable("home") {
             homeScreen(
                 onNavigateToWeather = {
