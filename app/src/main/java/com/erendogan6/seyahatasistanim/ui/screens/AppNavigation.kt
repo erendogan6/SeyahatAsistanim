@@ -11,8 +11,9 @@ import com.erendogan6.seyahatasistanim.BuildConfig
 fun appNavigation(
     navController: NavHostController,
     modifier: Modifier,
+    startDestination: String,
 ) {
-    NavHost(navController, startDestination = "travelInfo", modifier = modifier) {
+    NavHost(navController, startDestination = startDestination, modifier = modifier) {
         composable("travelInfo") {
             travelInfoScreen(navController = navController)
         }
