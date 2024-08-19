@@ -11,10 +11,9 @@ class WeatherRepository(
     fun getWeatherForecast(
         lat: Double,
         lon: Double,
-        apiKey: String,
     ): Flow<WeatherApiResponse> =
         flow {
-            val response = weatherApiService.getWeatherForecast(lat, lon, apiKey)
+            val response = weatherApiService.getWeatherForecast(lat, lon)
             emit(response)
         }
 }

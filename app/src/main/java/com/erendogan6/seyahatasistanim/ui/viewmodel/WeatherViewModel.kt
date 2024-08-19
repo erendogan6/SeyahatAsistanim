@@ -19,11 +19,10 @@ class WeatherViewModel(
     fun getWeatherForecast(
         lat: Double,
         lon: Double,
-        apiKey: String,
     ) {
         viewModelScope.launch {
             weatherRepository
-                .getWeatherForecast(lat, lon, apiKey)
+                .getWeatherForecast(lat, lon)
                 .catch { e ->
                     // Handle the error
                     _weatherData.value = null

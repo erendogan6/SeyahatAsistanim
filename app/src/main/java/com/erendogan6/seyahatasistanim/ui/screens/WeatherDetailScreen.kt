@@ -24,14 +24,13 @@ import org.koin.androidx.compose.koinViewModel
 fun weatherDetailScreen(
     lat: Double,
     lon: Double,
-    apiKey: String,
     modifier: Modifier = Modifier,
     viewModel: WeatherViewModel = koinViewModel(),
 ) {
     val weatherData by viewModel.weatherData.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getWeatherForecast(lat, lon, apiKey)
+        viewModel.getWeatherForecast(lat, lon)
     }
 
     Column(

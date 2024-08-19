@@ -39,11 +39,14 @@ val networkModule =
                         .newBuilder()
                         .addInterceptor { chain ->
                             val original = chain.request()
-                            val request =
-                                original
+                            val originalHttpUrl = original.url
+                            val url =
+                                originalHttpUrl
                                     .newBuilder()
-                                    .header("Authorization", "Bearer ${BuildConfig.OPENWEATHER_API_KEY}")
+                                    .addQueryParameter("appid", BuildConfig.OPENWEATHER_API_KEY)
                                     .build()
+                            val requestBuilder = original.newBuilder().url(url)
+                            val request = requestBuilder.build()
                             chain.proceed(request)
                         }.build(),
                 ).addConverterFactory(GsonConverterFactory.create())
