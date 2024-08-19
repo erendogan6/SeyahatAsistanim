@@ -58,7 +58,8 @@ android {
 dependencies {
 
     //Dependency Injection - Koin
-    implementation (libs.koin.android)
+    implementation libs.koin.android
+    implementation libs.koin.androidx.compose
 
     // Retrofit and OkHttp
     implementation libs.retrofit
