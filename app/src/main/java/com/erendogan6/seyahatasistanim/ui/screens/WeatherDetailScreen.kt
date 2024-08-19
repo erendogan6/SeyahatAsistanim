@@ -17,8 +17,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.erendogan6.seyahatasistanim.ui.viewmodel.WeatherViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun weatherDetailScreen(
@@ -26,9 +26,8 @@ fun weatherDetailScreen(
     lon: Double,
     apiKey: String,
     modifier: Modifier = Modifier,
+    viewModel: WeatherViewModel = koinViewModel(),
 ) {
-    val viewModel: WeatherViewModel = viewModel()
-
     val weatherData by viewModel.weatherData.collectAsState()
 
     LaunchedEffect(Unit) {
