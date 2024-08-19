@@ -8,14 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class WeatherViewModel :
-    ViewModel(),
-    KoinComponent {
-    private val weatherRepository: WeatherRepository by inject()
-
+class WeatherViewModel(
+    private val weatherRepository: WeatherRepository,
+) : ViewModel() {
     private val _weatherData = MutableStateFlow<WeatherApiResponse?>(null)
 
     val weatherData: StateFlow<WeatherApiResponse?> = _weatherData
