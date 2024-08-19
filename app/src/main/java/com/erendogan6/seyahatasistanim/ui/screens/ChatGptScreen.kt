@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -128,12 +129,19 @@ fun chatGptScreen(
                         Modifier
                             .weight(1f)
                             .border(
-                                width = 1.dp,
+                                width = 2.dp,
                                 color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(24.dp),
                             ),
                     placeholder = { Text("Mesajınızı yazın") },
                     shape = RoundedCornerShape(24.dp),
+                    colors =
+                        TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 FloatingActionButton(
