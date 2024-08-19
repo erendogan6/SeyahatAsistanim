@@ -71,7 +71,8 @@ dependencies {
     implementation libs.androidx.room.runtime
     implementation libs.androidx.navigation.compose
     annotationProcessor(libs.androidx.room.compiler)
-    kapt libs.androidx.room.compiler
+    kapt (libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
     // Coroutine
     implementation libs.kotlinx.coroutines.android
