@@ -11,7 +11,11 @@ class ChatGptRepository(
 ) {
     fun getSuggestions(request: ChatGptRequest): Flow<ChatGptResponse> =
         flow {
-            val response = chatGptApiService.getSuggestions(request)
-            emit(response)
+            try {
+                val response = chatGptApiService.getSuggestions(request)
+                emit(response)
+            } catch (e: Exception) {
+                throw e
+            }
         }
 }
