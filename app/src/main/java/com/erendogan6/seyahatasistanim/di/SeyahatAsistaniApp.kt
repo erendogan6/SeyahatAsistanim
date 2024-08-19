@@ -9,7 +9,12 @@ class SeyahatAsistaniApp : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@SeyahatAsistaniApp)
-            modules(listOf(networkModule))
+            modules(
+                listOf(
+                    networkModule,
+                    viewModelModule,
+                ),
+            )
         }
     }
 }
