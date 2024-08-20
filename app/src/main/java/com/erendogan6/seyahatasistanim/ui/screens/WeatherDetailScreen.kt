@@ -19,18 +19,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.erendogan6.seyahatasistanim.ui.viewmodel.WeatherViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
 
 @Composable
 fun weatherDetailScreen(
     lat: Double,
     lon: Double,
+    travelDate: LocalDate,
     modifier: Modifier = Modifier,
     viewModel: WeatherViewModel = koinViewModel(),
 ) {
     val weatherData by viewModel.weatherData.collectAsState()
+    val weatherFromDb by viewModel.weatherFromDb.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getWeatherForecast(lat, lon)
+        viewModel.loadWeatherFromDb(travelDate)
+        weatherFromDb?.let {
+            if (it.isEmpty()) {
+                viewModel.getWeatherForecast(lat, lon, travelDate)
+            }
+        } ?: run {
+            viewModel.getWeatherForecast(lat, lon, travelDate)
+        }
     }
 
     Column(
@@ -47,7 +57,6 @@ fun weatherDetailScreen(
             modifier = Modifier.padding(bottom = 16.dp),
         )
 
-        // Hava durumu verilerini gösteriyoruz
         weatherData?.let { data ->
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(data.forecastList) { forecast ->
