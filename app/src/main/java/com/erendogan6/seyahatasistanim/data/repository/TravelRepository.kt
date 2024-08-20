@@ -11,4 +11,8 @@ class TravelRepository(
     }
 
     suspend fun getLastTravelInfo(): TravelEntity? = travelDao.getLastTravelInfo()
+
+    suspend fun deleteAllTravelInfo() {
+        travelDao.deleteAllTravelInfo()
+    }
 }

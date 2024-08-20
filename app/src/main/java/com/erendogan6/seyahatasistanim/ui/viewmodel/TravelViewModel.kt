@@ -25,4 +25,11 @@ class TravelViewModel(
             _travelInfo.value = travelRepository.getLastTravelInfo()
         }
     }
+
+    fun deleteTravelInfo() {
+        viewModelScope.launch {
+            travelRepository.deleteAllTravelInfo()
+            _travelInfo.value = null
+        }
+    }
 }

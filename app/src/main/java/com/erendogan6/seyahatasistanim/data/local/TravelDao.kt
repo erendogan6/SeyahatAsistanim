@@ -12,4 +12,7 @@ interface TravelDao {
 
     @Query("SELECT * FROM travel_info ORDER BY id DESC LIMIT 1")
     suspend fun getLastTravelInfo(): TravelEntity?
+
+    @Query("DELETE FROM travel_info")
+    suspend fun deleteAllTravelInfo()
 }
