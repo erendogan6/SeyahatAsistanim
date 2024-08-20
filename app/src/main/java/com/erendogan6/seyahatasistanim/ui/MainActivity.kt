@@ -12,7 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.erendogan6.seyahatasistanim.ui.screens.appNavigation
-import com.erendogan6.seyahatasistanim.ui.theme.SeyahatAsistanımTheme
+import com.erendogan6.seyahatasistanim.ui.theme.seyahatAsistanimTheme
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SeyahatAsistanımTheme {
+            seyahatAsistanimTheme {
                 val navController = rememberNavController()
                 val startDestination = remember { mutableStateOf("travelInfo") }
 
