@@ -1,5 +1,6 @@
 package com.erendogan6.seyahatasistanim.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,13 +8,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.erendogan6.seyahatasistanim.R
+import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun homeScreen(
@@ -21,54 +30,113 @@ fun homeScreen(
     onNavigateToChecklist: () -> Unit,
     onNavigateToLocalInfo: () -> Unit,
     onNavigateToChatGpt: () -> Unit,
+    onNavigateToTravelInfo: () -> Unit,
     modifier: Modifier = Modifier,
+    travelViewModel: TravelViewModel = koinViewModel(),
 ) {
     Column(
         modifier =
             modifier
-                .fillMaxSize()
-                .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+                .fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Image(
+            painter = painterResource(R.drawable.logo),
+            contentDescription = "App Logo",
+            modifier =
+                Modifier
+                    .size(250.dp)
+                    .padding(top = 48.dp, bottom = 16.dp)
+                    .align(Alignment.CenterHorizontally),
+        )
+
         Text(
-            text = "THY Seyahat Hazırlık Asistanı",
-            style = MaterialTheme.typography.headlineMedium,
+            text = "Seyahat Hazırlık Asistanı",
+            style =
+                MaterialTheme.typography.headlineMedium.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 28.sp,
+                ),
             modifier = Modifier.padding(bottom = 32.dp),
         )
 
-        Button(
+        buttonWithIcon(
+            text = "Hava Durumu Detayları",
+            iconResId = R.drawable.ic_cloud,
             onClick = onNavigateToWeather,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Hava Durumu Detayları")
-        }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+        buttonWithIcon(
+            text = "Kontrol Listesi",
+            iconResId = R.drawable.ic_checklist,
             onClick = onNavigateToChecklist,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Kontrol Listesi")
-        }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+        buttonWithIcon(
+            text = "Yerel Bilgiler",
+            iconResId = R.drawable.ic_info,
             onClick = onNavigateToLocalInfo,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Yerel Bilgiler")
-        }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+        buttonWithIcon(
+            text = "ChatGPT ile Etkileşim",
+            iconResId = R.drawable.ic_chat,
             onClick = onNavigateToChatGpt,
-            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Button(
+            onClick = {
+                travelViewModel.deleteTravelInfo()
+                onNavigateToTravelInfo()
+            },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                ),
+            shape = MaterialTheme.shapes.medium,
+            elevation = ButtonDefaults.buttonElevation(8.dp),
         ) {
-            Text(text = "ChatGPT ile Etkileşim")
+            Text(text = "Yeni Seyahat")
         }
+    }
+}
+
+@Composable
+fun buttonWithIcon(
+    text: String,
+    iconResId: Int? = null,
+    onClick: () -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = ButtonDefaults.buttonElevation(8.dp),
+    ) {
+        iconResId?.let {
+            Icon(
+                painter = painterResource(id = it),
+                contentDescription = null,
+                modifier = Modifier.padding(end = 8.dp),
+            )
+        }
+        Text(text = text)
     }
 }
