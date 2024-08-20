@@ -1,6 +1,7 @@
 package com.erendogan6.seyahatasistanim.di
 
 import com.erendogan6.seyahatasistanim.BuildConfig
+import com.erendogan6.seyahatasistanim.data.local.TravelDatabase
 import com.erendogan6.seyahatasistanim.data.remote.ChatGptApiService
 import com.erendogan6.seyahatasistanim.data.remote.CityApiService
 import com.erendogan6.seyahatasistanim.data.remote.WeatherApiService
@@ -87,7 +88,10 @@ val networkModule =
         single { get<Retrofit>(named("cityRetrofit")).create(CityApiService::class.java) }
 
         single {
-            WeatherRepository(get())
+            WeatherRepository(
+                weatherApiService = get(),
+                weatherDao = get<TravelDatabase>().weatherDao(),
+            )
         }
 
         single {
