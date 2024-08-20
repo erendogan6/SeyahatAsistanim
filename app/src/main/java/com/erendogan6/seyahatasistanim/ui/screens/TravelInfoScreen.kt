@@ -136,7 +136,7 @@ fun travelInfoScreen(
                                 travelMethod = travelMethod,
                             )
                         viewModel.saveTravelInfo(travelEntity)
-                        navController.navigate("home")
+                        navController.navigate("home/$arrivalDate")
                     }
                 },
                 enabled = isFormValid,
@@ -265,7 +265,7 @@ fun travelMethodDropdown(
                 Modifier
                     .menuAnchor()
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 20.dp)
                     .shadow(2.dp, RoundedCornerShape(12.dp)),
             shape = RoundedCornerShape(12.dp),
             colors =
