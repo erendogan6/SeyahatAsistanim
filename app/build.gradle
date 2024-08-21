@@ -96,6 +96,9 @@ dependencies {
     // LeakCanary
     debugImplementation libs.leakcanary.android
 
+    // Markdown Compose
+    implementation libs.compose.markdown
+
     implementation libs.androidx.navigation.runtime.ktx
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation libs.androidx.runtime.livedata
