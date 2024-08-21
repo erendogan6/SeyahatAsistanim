@@ -17,7 +17,13 @@ val databaseModule =
                 ).build()
         }
 
+        single { get<TravelDatabase>().weatherDao() }
         single { get<TravelDatabase>().travelDao() }
 
-        single { TravelRepository(get()) }
+        single {
+            TravelRepository(
+                travelDao = get(),
+                cityApiService = get(),
+            )
+        }
     }
