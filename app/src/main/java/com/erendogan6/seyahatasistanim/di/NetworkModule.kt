@@ -1,11 +1,11 @@
 package com.erendogan6.seyahatasistanim.di
 
 import com.erendogan6.seyahatasistanim.BuildConfig
-import com.erendogan6.seyahatasistanim.data.local.TravelDatabase
 import com.erendogan6.seyahatasistanim.data.remote.ChatGptApiService
 import com.erendogan6.seyahatasistanim.data.remote.CityApiService
 import com.erendogan6.seyahatasistanim.data.remote.WeatherApiService
 import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepository
+import com.erendogan6.seyahatasistanim.data.repository.TravelRepository
 import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -31,26 +31,28 @@ val networkModule =
                 ).build()
         }
 
+        fun provideOkHttpClientWithApiKey(okHttpClient: OkHttpClient): OkHttpClient =
+            okHttpClient
+                .newBuilder()
+                .addInterceptor { chain ->
+                    val original = chain.request()
+                    val originalHttpUrl = original.url
+                    val url =
+                        originalHttpUrl
+                            .newBuilder()
+                            .addQueryParameter("appid", BuildConfig.OPENWEATHER_API_KEY)
+                            .build()
+                    val requestBuilder = original.newBuilder().url(url)
+                    val request = requestBuilder.build()
+                    chain.proceed(request)
+                }.build()
+
         single(named("weatherRetrofit")) {
             Retrofit
                 .Builder()
                 .baseUrl("https://pro.openweathermap.org/")
-                .client(
-                    get<OkHttpClient>()
-                        .newBuilder()
-                        .addInterceptor { chain ->
-                            val original = chain.request()
-                            val originalHttpUrl = original.url
-                            val url =
-                                originalHttpUrl
-                                    .newBuilder()
-                                    .addQueryParameter("appid", BuildConfig.OPENWEATHER_API_KEY)
-                                    .build()
-                            val requestBuilder = original.newBuilder().url(url)
-                            val request = requestBuilder.build()
-                            chain.proceed(request)
-                        }.build(),
-                ).addConverterFactory(GsonConverterFactory.create())
+                .client(provideOkHttpClientWithApiKey(get()))
+                .addConverterFactory(GsonConverterFactory.create())
                 .build()
         }
 
@@ -77,8 +79,8 @@ val networkModule =
         single(named("cityRetrofit")) {
             Retrofit
                 .Builder()
-                .baseUrl("https://api.cityapi.com/")
-                .client(get())
+                .baseUrl("https://api.openweathermap.org/")
+                .client(provideOkHttpClientWithApiKey(get()))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         }
@@ -90,11 +92,19 @@ val networkModule =
         single {
             WeatherRepository(
                 weatherApiService = get(),
-                weatherDao = get<TravelDatabase>().weatherDao(),
+                cityApiService = get(),
+                weatherDao = get(),
             )
         }
 
         single {
             ChatGptRepository(get())
+        }
+
+        single {
+            TravelRepository(
+                travelDao = get(),
+                cityApiService = get(),
+            )
         }
     }
