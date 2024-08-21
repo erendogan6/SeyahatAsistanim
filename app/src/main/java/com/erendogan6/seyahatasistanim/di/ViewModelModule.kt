@@ -10,5 +10,10 @@ val viewModelModule =
     module {
         viewModel { ChatGptViewModel(get()) }
         viewModel { WeatherViewModel(get()) }
-        viewModel { TravelViewModel(get()) }
+        viewModel {
+            TravelViewModel(
+                travelRepository = get(),
+                weatherRepository = get(),
+            )
+        }
     }
