@@ -5,6 +5,7 @@ import com.erendogan6.seyahatasistanim.data.remote.ChatGptApiService
 import com.erendogan6.seyahatasistanim.data.remote.CityApiService
 import com.erendogan6.seyahatasistanim.data.remote.WeatherApiService
 import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepository
+import com.erendogan6.seyahatasistanim.data.repository.LocalInfoRepository
 import com.erendogan6.seyahatasistanim.data.repository.TravelRepository
 import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
 import okhttp3.OkHttpClient
@@ -105,6 +106,12 @@ val networkModule =
             TravelRepository(
                 travelDao = get(),
                 cityApiService = get(),
+            )
+        }
+
+        single {
+            LocalInfoRepository(
+                localInfoDao = get(),
             )
         }
     }
