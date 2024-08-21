@@ -8,7 +8,7 @@ import org.koin.dsl.module
 
 val viewModelModule =
     module {
-        viewModel { ChatGptViewModel(get(), get()) }
+        viewModel { ChatGptViewModel(get(), get(), get()) }
         viewModel { WeatherViewModel(get()) }
         viewModel {
             TravelViewModel(
