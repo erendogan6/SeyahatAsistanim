@@ -1,5 +1,6 @@
 package com.erendogan6.seyahatasistanim.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,13 +21,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.erendogan6.seyahatasistanim.data.model.travel.TravelEntity
+import com.erendogan6.seyahatasistanim.data.model.weather.City
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import com.erendogan6.seyahatasistanim.utils.DateUtils
 import org.koin.androidx.compose.koinViewModel
@@ -54,13 +58,25 @@ fun travelInfoScreen(
     var departurePlace by remember { mutableStateOf("") }
     var arrivalPlace by remember { mutableStateOf("") }
     var travelMethod by remember { mutableStateOf("") }
+    var departureLatitude by remember { mutableStateOf<Double?>(null) }
+    var departureLongitude by remember { mutableStateOf<Double?>(null) }
+    var arrivalLatitude by remember { mutableStateOf<Double?>(null) }
+    var arrivalLongitude by remember { mutableStateOf<Double?>(null) }
+
+    val departureCityLoadingState by viewModel.departureCityLoadingState.collectAsState()
+    val arrivalCityLoadingState by viewModel.arrivalCityLoadingState.collectAsState()
+
     val isFormValid by remember {
         derivedStateOf {
             departureDate.isNotEmpty() &&
                 arrivalDate.isNotEmpty() &&
                 departurePlace.isNotEmpty() &&
                 arrivalPlace.isNotEmpty() &&
-                travelMethod.isNotEmpty()
+                travelMethod.isNotEmpty() &&
+                departureLatitude != null &&
+                departureLongitude != null &&
+                arrivalLatitude != null &&
+                arrivalLongitude != null
         }
     }
 
@@ -94,11 +110,29 @@ fun travelInfoScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            customTextField(
+            customCityField(
                 value = departurePlace,
-                onValueChange = { departurePlace = it },
+                onValueChange = {
+                    departurePlace = it
+                    viewModel.fetchDepartureCitySuggestions(it)
+                },
                 label = "Kalkış Yeri",
+                citySuggestions = (departureCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
+                onCitySelected = { city ->
+                    departurePlace =
+                        if (city.localNames?.tr != null) {
+                            city.localNames.tr + " - " + city.country
+                        } else {
+                            city.name + " - " + city.country
+                        }
+
+                    departureLatitude = city.latitude
+                    departureLongitude = city.longitude
+                    println(city.latitude)
+                },
+                loadingState = departureCityLoadingState,
             )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             datePickerField(
@@ -110,10 +144,25 @@ fun travelInfoScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            customTextField(
+            customCityField(
                 value = arrivalPlace,
-                onValueChange = { arrivalPlace = it },
+                onValueChange = {
+                    arrivalPlace = it
+                    viewModel.fetchArrivalCitySuggestions(it)
+                },
                 label = "Varış Yeri",
+                citySuggestions = (arrivalCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
+                onCitySelected = { city ->
+                    arrivalPlace =
+                        if (city.localNames?.tr != null) {
+                            city.localNames.tr + " - " + city.country
+                        } else {
+                            city.name + " - " + city.country
+                        }
+                    arrivalLatitude = city.latitude
+                    arrivalLongitude = city.longitude
+                },
+                loadingState = arrivalCityLoadingState,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,9 +183,13 @@ fun travelInfoScreen(
                                 departurePlace = departurePlace,
                                 arrivalPlace = arrivalPlace,
                                 travelMethod = travelMethod,
+                                departureLatitude = departureLatitude ?: 0.0,
+                                departureLongitude = departureLongitude ?: 0.0,
+                                arrivalLatitude = arrivalLatitude ?: 0.0,
+                                arrivalLongitude = arrivalLongitude ?: 0.0,
                             )
                         viewModel.saveTravelInfo(travelEntity)
-                        navController.navigate("home/$arrivalDate")
+                        navController.navigate("home")
                     }
                 },
                 enabled = isFormValid,
@@ -235,6 +288,85 @@ fun datePickerField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun customCityField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    citySuggestions: List<City>,
+    onCitySelected: (City) -> Unit,
+    loadingState: TravelViewModel.LoadingState<List<City>>,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCityText by remember { mutableStateOf(value) }
+
+    // Watch for changes in loadingState to control the dropdown expansion
+    LaunchedEffect(loadingState) {
+        expanded = loadingState is TravelViewModel.LoadingState.Loaded && loadingState.data.isNotEmpty()
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier,
+    ) {
+        TextField(
+            value = selectedCityText,
+            onValueChange = { text ->
+                selectedCityText = text
+                onValueChange(text)
+                Log.d("CustomCityField", "Query: $text, Suggestions count: ${citySuggestions.size}")
+            },
+            label = { Text(label) },
+            modifier =
+                Modifier
+                    .menuAnchor(MenuAnchorType.PrimaryEditable)
+                    .fillMaxWidth(),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        )
+
+        when (loadingState) {
+            is TravelViewModel.LoadingState.Loaded -> {
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    loadingState.data.forEach { city ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    if (city.localNames?.tr != null) {
+                                        city.localNames.tr + " - " + city.country
+                                    } else {
+                                        city.name + " - " + city.country
+                                    },
+                                )
+                            },
+                            onClick = {
+                                onCitySelected(city)
+                                selectedCityText =
+                                    if (city.localNames?.tr != null) {
+                                        city.localNames.tr + " - " + city.country
+                                    } else {
+                                        city.name + " - " + city.country
+                                    }
+                                Log.d("CustomCityField", "City clicked: ${city.name}")
+                                expanded = false
+                            },
+                        )
+                    }
+                }
+            }
+            else -> {
+                expanded = false
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun travelMethodDropdown(
     selectedMethod: String,
     onMethodSelected: (String) -> Unit,
@@ -263,18 +395,11 @@ fun travelMethodDropdown(
             },
             modifier =
                 Modifier
-                    .menuAnchor()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                     .fillMaxWidth()
                     .padding(vertical = 20.dp)
                     .shadow(2.dp, RoundedCornerShape(12.dp)),
             shape = RoundedCornerShape(12.dp),
-            colors =
-                TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
         )
 
         ExposedDropdownMenu(
@@ -292,38 +417,4 @@ fun travelMethodDropdown(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun customTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier,
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                text = label,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-        },
-        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .shadow(2.dp, RoundedCornerShape(12.dp)),
-        shape = RoundedCornerShape(12.dp),
-        colors =
-            TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-    )
 }
