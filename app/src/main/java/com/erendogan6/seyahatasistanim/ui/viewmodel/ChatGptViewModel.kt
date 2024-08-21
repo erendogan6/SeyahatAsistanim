@@ -26,8 +26,8 @@ class ChatGptViewModel(
     private val _localInfo = MutableStateFlow<LocalInfoEntity?>(null)
     val localInfo: StateFlow<LocalInfoEntity?> = _localInfo
 
-    private val _checklistItems = MutableStateFlow<List<String>>(emptyList())
-    val checklistItems: StateFlow<List<String>> = _checklistItems
+    private val _checklistItems = MutableStateFlow<List<ChecklistItemEntity>>(emptyList())
+    val checklistItems: StateFlow<List<ChecklistItemEntity>> = _checklistItems
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -122,7 +122,7 @@ class ChatGptViewModel(
                             ?.map { it.trimStart('-').trim() }
                             ?: emptyList()
 
-                    _checklistItems.value = checklistItems
+                    _checklistItems.value = checklistItems.map { ChecklistItemEntity(item = it) }
                     saveChecklistToDatabase(checklistItems)
                 }
                 _isLoading.value = false
@@ -177,10 +177,32 @@ class ChatGptViewModel(
         viewModelScope.launch {
             try {
                 val checklistItemsFromDb = checklistRepository.getAllChecklistItems()
-                _checklistItems.value = checklistItemsFromDb.map { it.item }
+                _checklistItems.value = checklistItemsFromDb.map { it }
             } catch (e: Exception) {
                 _error.value = e.message ?: "An error occurred while loading checklist items."
             }
+        }
+    }
+
+    fun addChecklistItem(item: String) {
+        viewModelScope.launch {
+            val newItem = ChecklistItemEntity(item = item)
+            checklistRepository.saveChecklistItems(listOf(newItem))
+            loadChecklistItems()
+        }
+    }
+
+    fun deleteChecklistItem(id: Int) {
+        viewModelScope.launch {
+            checklistRepository.deleteChecklistItem(id)
+            loadChecklistItems()
+        }
+    }
+
+    fun toggleItemCompletion(id: Int) {
+        viewModelScope.launch {
+            checklistRepository.toggleChecklistItemCompletion(id)
+            loadChecklistItems()
         }
     }
 }
