@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,30 +17,53 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.erendogan6.seyahatasistanim.data.model.weather.WeatherForecast
+import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import com.erendogan6.seyahatasistanim.ui.viewmodel.WeatherViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun weatherDetailScreen(
-    lat: Double,
-    lon: Double,
-    travelDate: LocalDate,
     modifier: Modifier = Modifier,
     viewModel: WeatherViewModel = koinViewModel(),
+    travelViewModel: TravelViewModel = koinViewModel(),
 ) {
+    val travelInfo by travelViewModel.travelInfo.collectAsState()
+
+    val parsedDate =
+        travelInfo?.arrivalDate?.let {
+            try {
+                LocalDate.parse(it, DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("tr")))
+            } catch (e: Exception) {
+                LocalDate.now()
+            }
+        } ?: LocalDate.now()
+
+    val lat = travelInfo?.arrivalLatitude ?: 0.0
+    val lon = travelInfo?.arrivalLongitude ?: 0.0
+
     val weatherData by viewModel.weatherData.collectAsState()
     val weatherFromDb by viewModel.weatherFromDb.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadWeatherFromDb(travelDate)
-        weatherFromDb?.let {
-            if (it.isEmpty()) {
-                viewModel.getWeatherForecast(lat, lon, travelDate)
+    LaunchedEffect(travelInfo) {
+        if (travelInfo != null) {
+            viewModel.loadWeatherFromDb(parsedDate)
+            weatherFromDb?.let {
+                if (it.isEmpty()) {
+                    viewModel.getWeatherForecast(lat, lon, parsedDate)
+                }
+            } ?: run {
+                viewModel.getWeatherForecast(lat, lon, parsedDate)
             }
-        } ?: run {
-            viewModel.getWeatherForecast(lat, lon, travelDate)
         }
     }
 
@@ -53,33 +77,81 @@ fun weatherDetailScreen(
     ) {
         Text(
             text = "Hava Durumu Detayları",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp),
+            style =
+                MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                ),
+            modifier = Modifier.padding(bottom = 24.dp),
         )
 
         weatherData?.let { data ->
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(data.forecastList) { forecast ->
-                    Card(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(text = "Gün: ${forecast.dateTime}", style = MaterialTheme.typography.bodyLarge)
-                            Text(text = "Gündüz Sıcaklığı: ${forecast.temp.day}°C", style = MaterialTheme.typography.bodyMedium)
-                            Text(text = "Gece Sıcaklığı: ${forecast.temp.night}°C", style = MaterialTheme.typography.bodyMedium)
-                            Text(
-                                text = "Açıklama: ${forecast.weather.firstOrNull()?.description}",
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        }
-                    }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(data.forecastList) { weatherForecast ->
+                    weatherForecastCard(weatherForecast = weatherForecast)
                 }
             }
         } ?: run {
-            Text(text = "Hava durumu verisi yükleniyor...", modifier = Modifier.padding(16.dp))
+            Text(
+                text = "Hava durumu verisi yükleniyor...",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+fun weatherForecastCard(weatherForecast: WeatherForecast) {
+    val localDateTime =
+        LocalDateTime.ofInstant(
+            Instant.ofEpochSecond(weatherForecast.dateTime),
+            ZoneId.systemDefault(),
+        )
+
+    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy, EEEE", Locale("tr"))
+    val formattedDate = localDateTime.format(formatter)
+
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = formattedDate,
+                style =
+                    MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    ),
+            )
+            Text(
+                text = "Gündüz Sıcaklığı: ${weatherForecast.temp.day}°C",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = "Gece Sıcaklığı: ${weatherForecast.temp.night}°C",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = "Açıklama: ${weatherForecast.weather.firstOrNull()?.description}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+            )
         }
     }
 }
