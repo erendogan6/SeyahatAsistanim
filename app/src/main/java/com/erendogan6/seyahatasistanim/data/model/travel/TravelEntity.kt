@@ -11,4 +11,8 @@ data class TravelEntity(
     val departurePlace: String,
     val arrivalPlace: String,
     val travelMethod: String,
+    val departureLatitude: Double,
+    val departureLongitude: Double,
+    val arrivalLatitude: Double,
+    val arrivalLongitude: Double,
 )
