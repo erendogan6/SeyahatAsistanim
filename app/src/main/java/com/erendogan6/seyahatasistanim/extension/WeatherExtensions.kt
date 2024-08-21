@@ -8,13 +8,13 @@ import java.time.ZoneId
 fun WeatherApiResponse.toEntityList(): List<WeatherEntity> =
     this.forecastList.map { forecast ->
         WeatherEntity(
-            id = generateIdForEntity(forecast.dateTime, city.coord.latitude, city.coord.longitude),
+            id = generateIdForEntity(forecast.dateTime, city.latitude, city.longitude),
             date = Instant.ofEpochSecond(forecast.dateTime).atZone(ZoneId.systemDefault()).toLocalDate(),
             temperatureDay = forecast.temp.day,
             temperatureNight = forecast.temp.night,
             description = forecast.weather.firstOrNull()?.description ?: "No description",
-            latitude = this.city.coord.latitude,
-            longitude = this.city.coord.longitude,
+            latitude = this.city.latitude,
+            longitude = this.city.longitude,
         )
     }
 
