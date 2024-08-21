@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.erendogan6.seyahatasistanim.data.model.travel.TravelEntity
 import com.erendogan6.seyahatasistanim.data.model.weather.City
+import com.erendogan6.seyahatasistanim.ui.viewmodel.ChatGptViewModel
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import com.erendogan6.seyahatasistanim.utils.DateUtils
 import org.koin.androidx.compose.koinViewModel
@@ -52,6 +53,7 @@ import org.koin.androidx.compose.koinViewModel
 fun travelInfoScreen(
     navController: NavController,
     viewModel: TravelViewModel = koinViewModel(),
+    chatGptViewModel: ChatGptViewModel = koinViewModel(),
 ) {
     var departureDate by remember { mutableStateOf("") }
     var arrivalDate by remember { mutableStateOf("") }
@@ -188,7 +190,7 @@ fun travelInfoScreen(
                                 arrivalLatitude = arrivalLatitude ?: 0.0,
                                 arrivalLongitude = arrivalLongitude ?: 0.0,
                             )
-                        viewModel.saveTravelInfo(travelEntity)
+                        viewModel.saveTravelInfo(travelEntity, chatGptViewModel)
                         navController.navigate("home")
                     }
                 },

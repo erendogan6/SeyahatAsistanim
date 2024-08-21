@@ -40,10 +40,14 @@ class TravelViewModel(
         loadLastTravelInfo()
     }
 
-    fun saveTravelInfo(travelEntity: TravelEntity) {
+    fun saveTravelInfo(
+        travelEntity: TravelEntity,
+        chatGptViewModel: ChatGptViewModel,
+    ) {
         viewModelScope.launch {
             travelRepository.saveTravelInfo(travelEntity)
             _travelInfo.value = travelEntity
+            chatGptViewModel.getLocalInfoForDestination(travelEntity.arrivalPlace)
         }
     }
 

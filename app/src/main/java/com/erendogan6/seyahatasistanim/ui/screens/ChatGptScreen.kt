@@ -147,7 +147,7 @@ fun chatGptScreen(
                 FloatingActionButton(
                     onClick = {
                         if (userInput.isNotBlank()) {
-                            chatGptViewModel.getSuggestions(prompt = userInput)
+                            chatGptViewModel.getLocalInfoForDestination(destination = userInput)
                             userInput = ""
                         }
                     },
