@@ -2,14 +2,19 @@ package com.erendogan6.seyahatasistanim.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,11 +23,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.weather.WeatherForecast
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import com.erendogan6.seyahatasistanim.ui.viewmodel.WeatherViewModel
+import com.erendogan6.seyahatasistanim.utils.capitalizeWords
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -67,39 +75,41 @@ fun weatherDetailScreen(
         }
     }
 
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
     ) {
-        Text(
-            text = "Hava Durumu Detayları",
-            style =
-                MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                ),
-            modifier = Modifier.padding(bottom = 24.dp),
-        )
-
-        weatherData?.let { data ->
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(data.forecastList) { weatherForecast ->
-                    weatherForecastCard(weatherForecast = weatherForecast)
-                }
-            }
-        } ?: run {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(
-                text = "Hava durumu verisi yükleniyor...",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp),
+                text = "Hava Durumu Detayları",
+                style =
+                    MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    ),
+                modifier = Modifier.padding(bottom = 24.dp),
             )
+
+            weatherData?.let { data ->
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(data.forecastList) { weatherForecast ->
+                        weatherForecastCard(weatherForecast = weatherForecast)
+                    }
+                }
+            } ?: run {
+                Text(
+                    text = "Hava durumu verisi yükleniyor...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
         }
     }
 }
@@ -125,33 +135,92 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(12.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(
-                text = formattedDate,
-                style =
-                    MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                    ),
-            )
-            Text(
-                text = "Gündüz Sıcaklığı: ${weatherForecast.temp.day}°C",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                text = "Gece Sıcaklığı: ${weatherForecast.temp.night}°C",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                text = "Açıklama: ${weatherForecast.weather.firstOrNull()?.description}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_calendar),
+                    contentDescription = "Date Icon",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(
+                    text = formattedDate,
+                    style =
+                        MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                        ),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = "Gündüz:",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                )
+                Text(
+                    text = "${weatherForecast.temp.day}°C",
+                    style =
+                        MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = "Gece:",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                )
+                Text(
+                    text = "${weatherForecast.temp.night}°C",
+                    style =
+                        MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                )
+            }
+
+            weatherForecast.weather.firstOrNull()?.description?.capitalizeWords()?.let {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_thermostat),
+                        contentDescription = "Weather Icon",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Text(
+                        text = it,
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black,
+                            ),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+            }
         }
     }
 }
