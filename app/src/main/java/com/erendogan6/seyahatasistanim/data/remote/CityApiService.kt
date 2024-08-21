@@ -8,7 +8,6 @@ interface CityApiService {
     @GET("geo/1.0/direct")
     suspend fun getCities(
         @Query("q") query: String,
-        @Query("appid") apiKey: String,
         @Query("limit") limit: Int = 5,
     ): List<City>
 }
