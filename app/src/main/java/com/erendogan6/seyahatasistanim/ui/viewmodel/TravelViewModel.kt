@@ -6,10 +6,14 @@ import com.erendogan6.seyahatasistanim.data.model.travel.TravelEntity
 import com.erendogan6.seyahatasistanim.data.model.weather.City
 import com.erendogan6.seyahatasistanim.data.repository.TravelRepository
 import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
+import com.erendogan6.seyahatasistanim.extension.toEntityList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class TravelViewModel(
     private val travelRepository: TravelRepository,
@@ -43,11 +47,33 @@ class TravelViewModel(
     fun saveTravelInfo(
         travelEntity: TravelEntity,
         chatGptViewModel: ChatGptViewModel,
+        weatherViewModel: WeatherViewModel,
     ) {
         viewModelScope.launch {
             travelRepository.saveTravelInfo(travelEntity)
             _travelInfo.value = travelEntity
+            val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("tr"))
+            val arrivalDate: LocalDate = LocalDate.parse(travelEntity.arrivalDate, formatter)
+
             chatGptViewModel.getLocalInfoForDestination(travelEntity.arrivalPlace)
+            weatherViewModel.getWeatherForecast(
+                travelEntity.arrivalLatitude,
+                travelEntity.arrivalLongitude,
+                arrivalDate,
+            )
+
+            weatherViewModel.weatherData.collect { weatherData ->
+                weatherData?.let {
+                    chatGptViewModel.generateChecklist(
+                        travelEntity.departurePlace,
+                        travelEntity.departureDate,
+                        travelEntity.arrivalPlace,
+                        travelEntity.arrivalDate,
+                        it.toEntityList(),
+                        travelEntity.travelMethod,
+                    )
+                }
+            }
         }
     }
 
