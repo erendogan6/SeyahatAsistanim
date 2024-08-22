@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.weather.WeatherForecast
+import com.erendogan6.seyahatasistanim.extension.toWeatherForecast
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import com.erendogan6.seyahatasistanim.ui.viewmodel.WeatherViewModel
 import com.erendogan6.seyahatasistanim.utils.capitalizeWords
@@ -112,22 +113,31 @@ fun weatherDetailScreen(
                 modifier = Modifier.padding(bottom = 24.dp),
             )
 
-            weatherData?.let { data ->
+            if (weatherData != null) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(data.forecastList) { weatherForecast ->
+                    items(weatherData!!.forecastList) { weatherForecast ->
                         weatherForecastCard(weatherForecast = weatherForecast)
                     }
                 }
-            } ?: run {
+            } else if (weatherFromDb != null && weatherFromDb!!.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    items(weatherFromDb!!) { weatherEntity ->
+                        weatherForecastCard(weatherForecast = weatherEntity.toWeatherForecast())
+                    }
+                }
+            } else {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Hava durumu verisi yükleniyor...",
+                        text = "Hava durumu verisi yüklenemedi.",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(16.dp),
                     )
