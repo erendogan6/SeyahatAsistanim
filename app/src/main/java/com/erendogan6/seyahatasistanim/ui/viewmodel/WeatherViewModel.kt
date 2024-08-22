@@ -1,5 +1,6 @@
 package com.erendogan6.seyahatasistanim.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erendogan6.seyahatasistanim.data.model.weather.WeatherApiResponse
@@ -33,16 +34,21 @@ class WeatherViewModel(
 
         if (daysDifference > 30) {
             _weatherData.value = null
+            Log.w("WeatherViewModel", "Skipping API call. Travel date ($travelDate) is more than 30 days in the future.")
             return
         }
 
         viewModelScope.launch {
+            Log.i("WeatherViewModel", "Fetching weather data for lat: $lat, lon: $lon for travel date: $travelDate.")
             weatherRepository
                 .getWeatherForecast(lat, lon)
-                .catch { _ -> _weatherData.value = null }
-                .collect { data ->
+                .catch { error ->
+                    _weatherData.value = null
+                    handleWeatherError(error, "Error fetching weather data for lat: $lat, lon: $lon.")
+                }.collect { data ->
                     saveWeatherDataToDb(data)
                     _weatherData.value = data
+                    Log.i("WeatherViewModel", "Weather data fetched successfully and saved to StateFlow.")
                 }
         }
     }
@@ -50,11 +56,25 @@ class WeatherViewModel(
     private suspend fun saveWeatherDataToDb(weatherData: WeatherApiResponse) {
         val weatherEntities = weatherData.toEntityList()
         weatherRepository.saveWeatherData(weatherEntities)
+        Log.i("WeatherViewModel", "Weather data saved to local database successfully.")
     }
 
     fun loadWeatherFromDb(travelDate: LocalDate) {
         viewModelScope.launch {
-            _weatherFromDb.value = weatherRepository.getWeatherData(travelDate)
+            Log.i("WeatherViewModel", "Loading weather data for $travelDate from local database.")
+            try {
+                _weatherFromDb.value = weatherRepository.getWeatherData(travelDate)
+                Log.i("WeatherViewModel", "Weather data for $travelDate loaded from database.")
+            } catch (e: Exception) {
+                handleWeatherError(e, "Error loading weather data from database.")
+            }
         }
+    }
+
+    private fun handleWeatherError(
+        error: Throwable,
+        customMessage: String,
+    ) {
+        Log.e("WeatherViewModel", "$customMessage - ${error.message}")
     }
 }
