@@ -1,3 +1,135 @@
 <resources>
-    <string name="app_name">SeyahatAsistanım</string>
+    <string name="app_name">TravelAssistant</string>
+    <string name="chat_with_gpt">Chat with GPT</string>
+    <string name="write_message">Write your message</string>
+    <string name="send">Send</string>
+    <string name="error_prefix">Error: %1$s</string>
+    <string name="checklist_title">Checklist</string>
+    <string name="no_checklist_items">No checklist items found.</string>
+    <string name="add_new_item">Add new item</string>
+    <string name="add">Add</string>
+    <string name="complete">Complete</string>
+    <string name="delete">Delete</string>
+    <string name="app_logo">App Logo</string>
+    <string name="weather_details">Weather Details</string>
+    <string name="checklist">Checklist</string>
+    <string name="local_info">Local Information</string>
+    <string name="chat_gpt_interaction">Interact with ChatGPT</string>
+    <string name="new_travel">New Travel</string>
+    <string name="error">Error: %1$s</string>
+    <string name="lottie_log_tag">LottieLoadingScreen</string>
+    <string name="loading_animation_requested">Loading animation composition requested</string>
+    <string name="animation_loaded">Animation composition successfully loaded, starting animation</string>
+    <string name="animation_load_failed">Failed to load animation composition, animation will not start</string>
+    <string name="travel_info_screen_log_tag">TravelInfoScreen</string>
+    <string name="loading_state_changed">LaunchedEffect: isLoading changed to %1$s</string>
+    <string name="rendering_ui_with_loading">Box: Rendering UI with isLoading = %1$s</string>
+    <string name="displaying_loading_animation">Box: Displaying loading animation</string>
+    <string name="displaying_travel_form">Box: Displaying travel form</string>
+    <string name="enter_travel_info">Please Enter Travel Information</string>
+    <string name="departure_place">Departure Place</string>
+    <string name="arrival_place">Arrival Place</string>
+    <string name="bus">Bus</string>
+    <string name="plane">Plane</string>
+    <string name="train">Train</string>
+    <string name="car">Car</string>
+    <string name="continue_text">Continue</string>
+    <string name="custom_city_field_log_tag">CustomCityField</string>
+    <string name="query_suggestions">Query: %1$s, Suggestions count: %2$d cities</string>
+    <string name="city_clicked">City clicked: %1$s</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="unknown_location">Unknown Location</string>
+    <string name="weather_data_unavailable">Weather data could not be loaded.</string>
+    <string name="day">Day:</string>
+    <string name="night">Night:</string>
+    <string name="date">Date</string>
+    <string name="temperature_day">Temperature (Day)</string>
+    <string name="temperature_night">Temperature (Night)</string>
+    <string name="weather_conditions">Weather Conditions</string>
+    <string name="travel_method">Travel Method</string>
+    <string name="failed_to_load_conversation">Failed to load conversation: %1$s</string>
+    <string name="failed_to_send_message">Failed to send message: %1$s</string>
+    <string name="travel_details">Travel details</string>
+    <string name="departure_location">Departure Location</string>
+    <string name="departure_date">Departure Date</string>
+    <string name="arrival_location">Arrival Location</string>
+    <string name="arrival_date">Arrival Date</string>
+    <string name="user_message">User message</string>
+    <string name="provide_helpful_information">Please provide helpful information in this travel context.</string>
+    <string name="fetching_local_info">Fetching local info for destination: %1$s</string>
+    <string name="local_info_found_in_db">Local info found in DB for destination: %1$s</string>
+    <string name="no_local_info_found">No local info found in DB for %1$s, making API request.</string>
+    <string name="local_info_saved_to_db">Local info for %1$s successfully saved to DB.</string>
+    <string name="received_empty_response">Received empty response for %1$s.</string>
+    <string name="error_fetching_local_info">Error fetching local info for %1$s: %2$s</string>
+    <string name="finished_processing_local_info">Finished processing local info for %1$s, loading set to false.</string>
+    <string name="generating_checklist">Generating checklist for destination: %1$s</string>
+    <string name="based_on_travel_details">Based on the following travel details</string>
+    <string name="weather_forecast_for_next_7_days">Weather forecast for the next 7 days</string>
+    <string name="checklist_generated_and_saved">Checklist generated and saved to DB for %1$s.</string>
+    <string name="error_generating_checklist">Error generating checklist for %1$s: %2$s</string>
+    <string name="finished_generating_checklist">Finished generating checklist for %1$s, loading set to false.</string>
+    <string name="checklist_items_saved_to_db">Checklist items saved to local database.</string>
+    <string name="loading_checklist_items">Loading checklist items from database.</string>
+    <string name="checklist_items_loaded_from_db">Checklist items loaded from database.</string>
+    <string name="error_loading_checklist_items">Error loading checklist items from database: %1$s</string>
+    <string name="adding_new_checklist_item">Adding new checklist item: %1$s</string>
+    <string name="new_checklist_item_added">New checklist item added and checklist reloaded.</string>
+    <string name="error_adding_checklist_item">Error adding checklist item: %1$s</string>
+    <string name="deleting_checklist_item">Deleting checklist item with ID: %1$d</string>
+    <string name="checklist_item_deleted">Checklist item deleted and checklist reloaded.</string>
+    <string name="error_deleting_checklist_item">Error deleting checklist item with ID %1$d: %2$s</string>
+    <string name="toggling_completion_status">Toggling completion status for checklist item with ID: %1$d</string>
+    <string name="completion_status_toggled">Completion status toggled and checklist reloaded.</string>
+    <string name="error_toggling_completion_status">Error toggling completion status for checklist item with ID %1$d: %2$s</string>
+    <string name="planning_trip_to">I am planning a trip to %1$s</string>
+    <string name="can_you_provide_local_info">Can you provide comprehensive local information that would be helpful during my visit?</string>
+    <string name="include_tips">Please include cultural highlights, historical sites, popular attractions, local cuisine, transportation options, and other important tips that can enhance my experience in %1$s. Additionally, provide any seasonal or weather-related advice that I should consider during my stay.</string>
+    <string name="started">Started</string>
+    <string name="travel_info_saved_to_db">Travel information saved to database</string>
+    <string name="weather_data_received">Weather data received: %1$s</string>
+    <string name="local_info_received">Local info received: %1$s</string>
+    <string name="checklist_created">Checklist created: %1$s</string>
+    <string name="combined_loading_state">Combined isLoading state: %1$s</string>
+    <string name="all_processes_completed">All processes completed, onTravelInfoSaved called.</string>
+    <string name="unknown_error_occurred">An unknown error occurred.</string>
+    <string name="load_last_travel_info">Loading last travel info from DB</string>
+    <string name="last_travel_info_loaded">Last travel info loaded.</string>
+    <string name="delete_travel_info">Deleting all travel info from DB</string>
+    <string name="travel_info_deleted">Travel info deleted.</string>
+    <string name="fetch_departure_city_suggestions">Fetching suggestions for %1$s</string>
+    <string name="fetch_arrival_city_suggestions">Fetching suggestions for %1$s</string>
+    <string name="error_fetching_suggestions">Error fetching suggestions</string>
+    <string name="failed_to_load_suggestions">Failed to load suggestions</string>
+    <string name="suggestions_received">Suggestions received: %1$d cities</string>
+    <string name="query_is_blank">Query is blank, no suggestions fetched</string>
+    <string name="skipping_api_call">Skipping API call. Travel date (%1$s) is more than 30 days in the future.</string>
+    <string name="fetching_weather_data">Fetching weather data for lat: %1$s, lon: %2$s for travel date: %3$s.</string>
+    <string name="error_fetching_weather_data_api">Error fetching weather data from API: %1$s. Loading data from DB.</string>
+    <string name="error_fetching_weather_data">Error fetching weather data for lat: %1$s, lon: %2$s.</string>
+    <string name="weather_data_fetched">Weather data fetched successfully and saved to StateFlow.</string>
+    <string name="weather_data_saved_to_db">Weather data saved to local database successfully.</string>
+    <string name="loading_weather_data_from_db">Loading weather data for %1$s from local database.</string>
+    <string name="weather_data_loaded_from_db">Weather data for %1$s loaded from database.</string>
+    <string name="error_loading_weather_data">Error loading weather data from database.</string>
+    <string name="welcome_message">🌍 Welcome to \nTravel Assistant! ✈️</string>
+    <string name="weather_summary_format">Date: %1$s, Temperature: Day %2$.1f°C, Night %3$.1f°C, Weather: %4$s</string>
+    <string name="checklist_prompt_format">
+        Based on the following travel information, create a checklist of items I should bring with me:
+        - Departure Location: %1$s
+        - Departure Date: %2$s
+        - Destination: %3$s
+        - Arrival Date: %4$s
+        - Travel Method: %5$s
+        - Weather forecast for the 7 days after arrival:
+        %6$s
+
+        Please create the checklist with attention to the following:
+        - Items needed for the travel method (e.g., plane, train, car, etc.)
+        - Items suitable for local conditions at the destination
+        - Items suitable for the weather conditions at the destination
+
+        In your response, only list the checklist items and do not provide any further explanation or information.
+    </string>
 </resources>

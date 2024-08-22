@@ -38,10 +38,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.ui.viewmodel.ChatGptViewModel
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
@@ -89,7 +91,7 @@ fun chatGptScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "ChatGPT ile Etkileşim",
+                    text = stringResource(id = R.string.chat_with_gpt),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -135,7 +137,7 @@ fun chatGptScreen(
                                 color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(24.dp),
                             ),
-                    placeholder = { Text("Mesajınızı yazın") },
+                    placeholder = { Text(stringResource(id = R.string.write_message)) },
                     shape = RoundedCornerShape(24.dp),
                     colors =
                         TextFieldDefaults.colors(
@@ -163,7 +165,7 @@ fun chatGptScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Gönder",
+                        contentDescription = stringResource(id = R.string.send),
                         tint = Color.White,
                     )
                 }
@@ -228,7 +230,7 @@ fun loadingAnimation() {
 @Composable
 fun errorMessage(error: String) {
     Text(
-        text = "Hata: $error",
+        text = stringResource(id = R.string.error_prefix, error),
         color = MaterialTheme.colorScheme.error,
         modifier = Modifier.padding(16.dp),
     )

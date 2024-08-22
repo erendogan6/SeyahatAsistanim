@@ -1,8 +1,10 @@
 package com.erendogan6.seyahatasistanim.ui.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.weather.WeatherApiResponse
 import com.erendogan6.seyahatasistanim.data.model.weather.WeatherEntity
 import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
@@ -16,6 +18,7 @@ import java.time.temporal.ChronoUnit
 
 class WeatherViewModel(
     private val weatherRepository: WeatherRepository,
+    private val context: Context, // Injecting Context to access string resources
 ) : ViewModel() {
     private val _weatherData = MutableStateFlow<WeatherApiResponse?>(null)
     val weatherData: StateFlow<WeatherApiResponse?> = _weatherData
@@ -34,22 +37,28 @@ class WeatherViewModel(
 
         if (daysDifference > 30) {
             _weatherData.value = null
-            Log.w("WeatherViewModel", "Skipping API call. Travel date ($travelDate) is more than 30 days in the future.")
+            Log.w("WeatherViewModel", context.getString(R.string.skipping_api_call, travelDate.toString()))
             return
         }
 
         viewModelScope.launch {
-            Log.i("WeatherViewModel", "Fetching weather data for lat: $lat, lon: $lon for travel date: $travelDate.")
+            Log.i(
+                "WeatherViewModel",
+                context.getString(R.string.fetching_weather_data, lat.toString(), lon.toString(), travelDate.toString()),
+            )
             weatherRepository
                 .getWeatherForecast(lat, lon)
                 .catch { error ->
-                    Log.e("WeatherViewModel", "Error fetching weather data from API: ${error.message}. Loading data from DB.")
+                    Log.e(
+                        "WeatherViewModel",
+                        context.getString(R.string.error_fetching_weather_data_api, error.message ?: "Unknown Error"),
+                    )
                     loadWeatherFromDb(travelDate)
-                    handleWeatherError(error, "Error fetching weather data for lat: $lat, lon: $lon.")
+                    handleWeatherError(error, context.getString(R.string.error_fetching_weather_data, lat.toString(), lon.toString()))
                 }.collect { data ->
                     saveWeatherDataToDb(data)
                     _weatherData.value = data
-                    Log.i("WeatherViewModel", "Weather data fetched successfully and saved to StateFlow.")
+                    Log.i("WeatherViewModel", context.getString(R.string.weather_data_fetched))
                 }
         }
     }
@@ -57,17 +66,17 @@ class WeatherViewModel(
     private suspend fun saveWeatherDataToDb(weatherData: WeatherApiResponse) {
         val weatherEntities = weatherData.toEntityList()
         weatherRepository.saveWeatherData(weatherEntities)
-        Log.i("WeatherViewModel", "Weather data saved to local database successfully.")
+        Log.i("WeatherViewModel", context.getString(R.string.weather_data_saved_to_db))
     }
 
     fun loadWeatherFromDb(travelDate: LocalDate) {
         viewModelScope.launch {
-            Log.i("WeatherViewModel", "Loading weather data for $travelDate from local database.")
+            Log.i("WeatherViewModel", context.getString(R.string.loading_weather_data_from_db, travelDate.toString()))
             try {
                 _weatherFromDb.value = weatherRepository.getWeatherData(travelDate)
-                Log.i("WeatherViewModel", "Weather data for $travelDate loaded from database.")
+                Log.i("WeatherViewModel", context.getString(R.string.weather_data_loaded_from_db, travelDate.toString()))
             } catch (e: Exception) {
-                handleWeatherError(e, "Error loading weather data from database.")
+                handleWeatherError(e, context.getString(R.string.error_loading_weather_data))
             }
         }
     }

@@ -27,7 +27,6 @@ val repositoryModule =
         single {
             TravelRepository(
                 travelDao = get(),
-                cityApiService = get(),
             )
         }
 

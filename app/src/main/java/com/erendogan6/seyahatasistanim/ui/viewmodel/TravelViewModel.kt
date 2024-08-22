@@ -1,8 +1,10 @@
 package com.erendogan6.seyahatasistanim.ui.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.travel.TravelEntity
 import com.erendogan6.seyahatasistanim.data.model.weather.City
 import com.erendogan6.seyahatasistanim.data.model.weather.WeatherEntity
@@ -23,9 +25,11 @@ import java.util.Locale
 class TravelViewModel(
     private val travelRepository: TravelRepository,
     private val weatherRepository: WeatherRepository,
+    private val context: Context,
 ) : ViewModel() {
+    // Loading states definition
     sealed class LoadingState<out T> {
-        data object Loading : LoadingState<Nothing>()
+        object Loading : LoadingState<Nothing>()
 
         data class Loaded<T>(
             val data: T,
@@ -36,6 +40,7 @@ class TravelViewModel(
         ) : LoadingState<Nothing>()
     }
 
+    // State variables
     private val _travelInfo = MutableStateFlow<TravelEntity?>(null)
     val travelInfo: StateFlow<TravelEntity?> get() = _travelInfo
 
@@ -48,12 +53,6 @@ class TravelViewModel(
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState: StateFlow<String?> get() = _errorState
 
-    private var debounceJob: Job? = null
-
-    init {
-        loadLastTravelInfo()
-    }
-
     private val _isTravelInfoLoading = MutableStateFlow(false)
     private val _isWeatherLoading = MutableStateFlow(false)
     private val _isLocalInfoLoading = MutableStateFlow(false)
@@ -62,6 +61,13 @@ class TravelViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
+    private var debounceJob: Job? = null
+
+    init {
+        loadLastTravelInfo()
+    }
+
+    // Saving travel information and initiating loading processes
     fun saveTravelInfo(
         travelEntity: TravelEntity,
         chatGptViewModel: ChatGptViewModel,
@@ -70,7 +76,7 @@ class TravelViewModel(
     ) {
         viewModelScope.launch {
             try {
-                Log.d("TravelViewModel", "saveTravelInfo: Başladı")
+                Log.d("TravelViewModel", "saveTravelInfo: ${context.getString(R.string.started)}")
 
                 saveTravelInfoToDatabase(travelEntity)
                 initiateWeatherAndLocalInfoLoading(travelEntity, chatGptViewModel, weatherViewModel)
@@ -81,14 +87,16 @@ class TravelViewModel(
         }
     }
 
+    // Save travel information to the database
     private suspend fun saveTravelInfoToDatabase(travelEntity: TravelEntity) {
         _isTravelInfoLoading.value = true
         travelRepository.saveTravelInfo(travelEntity)
         _travelInfo.value = travelEntity
-        Log.d("TravelViewModel", "saveTravelInfo: Seyahat bilgisi veritabanına kaydedildi")
+        Log.d("TravelViewModel", context.getString(R.string.travel_info_saved_to_db))
         _isTravelInfoLoading.value = false
     }
 
+    // Initiate loading weather and local info data
     private fun initiateWeatherAndLocalInfoLoading(
         travelEntity: TravelEntity,
         chatGptViewModel: ChatGptViewModel,
@@ -98,7 +106,7 @@ class TravelViewModel(
         val arrivalDate: LocalDate =
             LocalDate.parse(
                 travelEntity.arrivalDate,
-                DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("tr")),
+                DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault()),
             )
 
         _isWeatherLoading.value = true
@@ -114,7 +122,7 @@ class TravelViewModel(
         viewModelScope.launch {
             weatherViewModel.weatherData.collect { weatherData ->
                 weatherData?.let {
-                    Log.d("TravelViewModel", "Hava durumu verisi alındı: $weatherData")
+                    Log.d("TravelViewModel", context.getString(R.string.weather_data_received, weatherData))
                     _isWeatherLoading.value = false
                     initiateChecklistGeneration(chatGptViewModel, travelEntity, it.toEntityList())
                 }
@@ -124,7 +132,7 @@ class TravelViewModel(
         viewModelScope.launch {
             chatGptViewModel.localInfo.collect { localInfo ->
                 localInfo?.let {
-                    Log.d("TravelViewModel", "Yerel bilgi alındı: $localInfo")
+                    Log.d("TravelViewModel", context.getString(R.string.local_info_received, localInfo))
                     _isLocalInfoLoading.value = false
                 }
             }
@@ -133,16 +141,14 @@ class TravelViewModel(
         viewModelScope.launch {
             chatGptViewModel.checklistItems.collect { checklistItems ->
                 checklistItems.let {
-                    Log.d(
-                        "TravelViewModel",
-                        "Checklist oluşturuldu: $checklistItems",
-                    )
+                    Log.d("TravelViewModel", context.getString(R.string.checklist_created, checklistItems))
                     _isChecklistLoading.value = false
                 }
             }
         }
     }
 
+    // Start generating a checklist based on weather and travel info
     private fun initiateChecklistGeneration(
         chatGptViewModel: ChatGptViewModel,
         travelEntity: TravelEntity,
@@ -159,6 +165,7 @@ class TravelViewModel(
         )
     }
 
+    // Monitor loading states and trigger the final callback
     private fun monitorLoadingStates(onTravelInfoSaved: () -> Unit) {
         viewModelScope.launch {
             combine(
@@ -170,17 +177,18 @@ class TravelViewModel(
                 travelLoading || weatherLoading || localInfoLoading || checklistLoading
             }.collect { combinedLoading ->
                 _isLoading.value = combinedLoading
-                Log.d("TravelViewModel", "Birleşik isLoading durumu: $combinedLoading")
+                Log.d("TravelViewModel", context.getString(R.string.combined_loading_state, combinedLoading))
                 if (!combinedLoading) {
                     onTravelInfoSaved()
-                    Log.d("TravelViewModel", "Tüm işlemler tamamlandı, onTravelInfoSaved çağırıldı.")
+                    Log.d("TravelViewModel", context.getString(R.string.all_processes_completed))
                 }
             }
         }
     }
 
+    // Handle loading errors and reset states
     private fun handleLoadingError(e: Exception) {
-        val errorMessage = e.message ?: "Bilinmeyen bir hata oluştu."
+        val errorMessage = e.message ?: context.getString(R.string.unknown_error_occurred)
         _errorState.value = errorMessage
         handleTravelError(e, errorMessage)
         _isTravelInfoLoading.value = false
@@ -190,24 +198,27 @@ class TravelViewModel(
         _isLoading.value = false
     }
 
+    // Load the last travel information from the database
     fun loadLastTravelInfo() {
         viewModelScope.launch {
-            Log.d("TravelViewModel", "loadLastTravelInfo: Loading last travel info from DB")
+            Log.d("TravelViewModel", context.getString(R.string.load_last_travel_info))
             val lastTravelInfo = travelRepository.getLastTravelInfo()
             _travelInfo.value = lastTravelInfo
-            Log.d("TravelViewModel", "loadLastTravelInfo: Last travel info loaded: ")
+            Log.d("TravelViewModel", context.getString(R.string.last_travel_info_loaded))
         }
     }
 
+    // Delete all travel information from the database
     fun deleteTravelInfo() {
         viewModelScope.launch {
-            Log.d("TravelViewModel", "deleteTravelInfo: Deleting all travel info from DB")
+            Log.d("TravelViewModel", context.getString(R.string.delete_travel_info))
             travelRepository.deleteAllTravelInfo()
             _travelInfo.value = null
-            Log.d("TravelViewModel", "deleteTravelInfo: Travel info deleted")
+            Log.d("TravelViewModel", context.getString(R.string.travel_info_deleted))
         }
     }
 
+    // Fetch suggestions for departure cities with a debounce
     fun fetchDepartureCitySuggestions(query: String) {
         debounceJob?.cancel()
         debounceJob =
@@ -215,44 +226,46 @@ class TravelViewModel(
                 delay(300) // 300ms debounce
                 if (query.isNotBlank()) {
                     _departureCityLoadingState.value = LoadingState.Loading
-                    Log.d("TravelViewModel", "fetchDepartureCitySuggestions: Fetching suggestions for $query")
+                    Log.d("TravelViewModel", context.getString(R.string.fetch_departure_city_suggestions, query))
                     weatherRepository
                         .getCitySuggestions(query)
                         .catch { error ->
-                            handleTravelError(error, "Error fetching suggestions")
-                            _departureCityLoadingState.value = LoadingState.Error("Failed to load suggestions")
+                            handleTravelError(error, context.getString(R.string.error_fetching_suggestions))
+                            _departureCityLoadingState.value = LoadingState.Error(context.getString(R.string.failed_to_load_suggestions))
                         }.collect { cities ->
-                            Log.d("TravelViewModel", "fetchDepartureCitySuggestions: Suggestions received: ${cities.size} cities")
+                            Log.d("TravelViewModel", context.getString(R.string.suggestions_received, cities.size))
                             _departureCityLoadingState.value = LoadingState.Loaded(cities)
                         }
                 } else {
                     _departureCityLoadingState.value = LoadingState.Loaded(emptyList())
-                    Log.d("TravelViewModel", "fetchDepartureCitySuggestions: Query is blank, no suggestions fetched")
+                    Log.d("TravelViewModel", context.getString(R.string.query_is_blank))
                 }
             }
     }
 
+    // Fetch suggestions for arrival cities
     fun fetchArrivalCitySuggestions(query: String) {
         if (query.isNotBlank()) {
             _arrivalCityLoadingState.value = LoadingState.Loading
-            Log.d("TravelViewModel", "fetchArrivalCitySuggestions: Fetching suggestions for $query")
+            Log.d("TravelViewModel", context.getString(R.string.fetch_arrival_city_suggestions, query))
             viewModelScope.launch {
                 weatherRepository
                     .getCitySuggestions(query)
                     .catch { error ->
-                        handleTravelError(error, "Error fetching suggestions")
-                        _arrivalCityLoadingState.value = LoadingState.Error("Failed to load suggestions")
+                        handleTravelError(error, context.getString(R.string.error_fetching_suggestions))
+                        _arrivalCityLoadingState.value = LoadingState.Error(context.getString(R.string.failed_to_load_suggestions))
                     }.collect { cities ->
-                        Log.d("TravelViewModel", "fetchArrivalCitySuggestions: Suggestions received: ${cities.size} cities")
+                        Log.d("TravelViewModel", context.getString(R.string.suggestions_received, cities.size))
                         _arrivalCityLoadingState.value = LoadingState.Loaded(cities)
                     }
             }
         } else {
             _arrivalCityLoadingState.value = LoadingState.Loaded(emptyList())
-            Log.d("TravelViewModel", "fetchArrivalCitySuggestions: Query is blank, no suggestions fetched")
+            Log.d("TravelViewModel", context.getString(R.string.query_is_blank))
         }
     }
 
+    // Handle travel-related errors
     private fun handleTravelError(
         error: Throwable,
         customMessage: String,

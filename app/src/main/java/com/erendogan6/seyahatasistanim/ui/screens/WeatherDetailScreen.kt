@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,7 +57,7 @@ fun weatherDetailScreen(
     val parsedDate =
         travelInfo?.arrivalDate?.let {
             try {
-                LocalDate.parse(it, DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("tr")))
+                LocalDate.parse(it, DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault()))
             } catch (e: Exception) {
                 LocalDate.now()
             }
@@ -64,7 +65,7 @@ fun weatherDetailScreen(
 
     val lat = travelInfo?.arrivalLatitude ?: 0.0
     val lon = travelInfo?.arrivalLongitude ?: 0.0
-    val arrivalLocation = travelInfo?.arrivalPlace ?: "Bilinmeyen Lokasyon"
+    val arrivalLocation = travelInfo?.arrivalPlace ?: stringResource(id = R.string.unknown_location)
 
     val weatherData by viewModel.weatherData.collectAsState()
     val weatherFromDb by viewModel.weatherFromDb.collectAsState()
@@ -92,7 +93,7 @@ fun weatherDetailScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Hava Durumu Detayları",
+                text = stringResource(id = R.string.weather_details),
                 style =
                     MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
@@ -137,7 +138,7 @@ fun weatherDetailScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Hava durumu verisi yüklenemedi.",
+                        text = stringResource(id = R.string.weather_data_unavailable),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(16.dp),
                     )
@@ -155,7 +156,7 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
             ZoneId.systemDefault(),
         )
 
-    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy, EEEE", Locale("tr"))
+    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy, EEEE", Locale.getDefault())
     val formattedDate = localDateTime.format(formatter)
 
     Card(
@@ -174,7 +175,7 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_calendar),
-                    contentDescription = "Date Icon",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(36.dp),
                 )
@@ -203,7 +204,7 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "Gündüz:",
+                    text = stringResource(id = R.string.day),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                 )
                 Text(
@@ -231,7 +232,7 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "Gece:",
+                    text = stringResource(id = R.string.night),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                 )
                 Text(
@@ -260,7 +261,7 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_thermostat),
-                        contentDescription = "Weather Icon",
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(36.dp),
                     )

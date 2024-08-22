@@ -19,11 +19,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.ui.viewmodel.ChatGptViewModel
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
@@ -54,7 +56,7 @@ fun localInfoScreen(
                 .padding(16.dp),
     ) {
         Text(
-            text = "Yerel Bilgiler",
+            text = stringResource(id = R.string.local_info),
             style =
                 MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
@@ -80,7 +82,7 @@ fun localInfoScreen(
             }
             error != null -> {
                 Text(
-                    text = "Hata: $error",
+                    text = stringResource(id = R.string.error, error.toString()),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.error,
@@ -127,7 +129,7 @@ fun localInfoScreen(
             }
             else -> {
                 Text(
-                    text = "Yerel bilgiler bulunamadı.",
+                    text = stringResource(id = R.string.no_local_info_found),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onBackground,

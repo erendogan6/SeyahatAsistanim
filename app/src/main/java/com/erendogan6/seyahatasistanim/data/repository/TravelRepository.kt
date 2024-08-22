@@ -2,11 +2,9 @@ package com.erendogan6.seyahatasistanim.data.repository
 
 import com.erendogan6.seyahatasistanim.data.local.TravelDao
 import com.erendogan6.seyahatasistanim.data.model.travel.TravelEntity
-import com.erendogan6.seyahatasistanim.data.remote.CityApiService
 
 class TravelRepository(
     private val travelDao: TravelDao,
-    private val cityApiService: CityApiService,
 ) {
     suspend fun saveTravelInfo(travelEntity: TravelEntity) {
         travelDao.insertTravelInfo(travelEntity)

@@ -38,10 +38,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.travel.TravelEntity
 import com.erendogan6.seyahatasistanim.data.model.weather.City
 import com.erendogan6.seyahatasistanim.ui.viewmodel.ChatGptViewModel
@@ -59,27 +65,53 @@ fun travelInfoScreen(
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
 
+    val logTag = stringResource(id = R.string.travel_info_screen_log_tag)
+    val loadingStateChangedMessage = stringResource(id = R.string.loading_state_changed, isLoading)
+
     LaunchedEffect(isLoading) {
-        Log.d("travelInfoScreen", "LaunchedEffect: isLoading changed to $isLoading")
+        Log.d(logTag, loadingStateChangedMessage)
     }
 
     Box(
-        modifier =
-            Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter,
     ) {
-        Log.d("travelInfoScreen", "Box: Rendering UI with isLoading = $isLoading")
-        if (isLoading) {
-            Log.d("travelInfoScreen", "Box: Displaying loading animation")
-            lottieLoadingScreen()
-        } else {
-            Log.d("travelInfoScreen", "Box: Displaying travel form")
-            travelForm(
-                viewModel = viewModel,
-                chatGptViewModel = chatGptViewModel,
-                weatherViewModel = weatherViewModel,
-                navController = navController,
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(id = R.string.welcome_message),
+                style =
+                    MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 28.sp,
+                        letterSpacing = 1.5.sp,
+                        shadow =
+                            Shadow(
+                                color = Color(0xFF444444),
+                                offset = Offset(2f, 2f),
+                                blurRadius = 8f,
+                            ),
+                    ),
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                modifier =
+                    Modifier
+                        .padding(start = 8.dp, end = 8.dp, top = 20.dp),
             )
+
+            if (isLoading) {
+                lottieLoadingScreen()
+            } else {
+                travelForm(
+                    viewModel = viewModel,
+                    chatGptViewModel = chatGptViewModel,
+                    weatherViewModel = weatherViewModel,
+                    navController = navController,
+                )
+            }
         }
     }
 }
@@ -123,15 +155,12 @@ fun travelForm(
         color = MaterialTheme.colorScheme.background,
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
+            modifier = Modifier.fillMaxSize().padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Lütfen Seyahat Bilgilerini Girin",
+                text = stringResource(id = R.string.enter_travel_info),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -142,7 +171,7 @@ fun travelForm(
             datePickerField(
                 value = departureDate,
                 onValueChange = { departureDate = it },
-                label = "Kalkış Tarihi",
+                label = stringResource(id = R.string.departure_date),
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -154,7 +183,7 @@ fun travelForm(
                     departurePlace = it
                     viewModel.fetchDepartureCitySuggestions(it)
                 },
-                label = "Kalkış Yeri",
+                label = stringResource(id = R.string.departure_place),
                 citySuggestions = (departureCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
                 onCitySelected = { city ->
                     departurePlace =
@@ -163,7 +192,6 @@ fun travelForm(
                         } else {
                             city.name + " - " + city.country
                         }
-
                     departureLatitude = city.latitude
                     departureLongitude = city.longitude
                 },
@@ -175,7 +203,7 @@ fun travelForm(
             datePickerField(
                 value = arrivalDate,
                 onValueChange = { arrivalDate = it },
-                label = "Varış Tarihi",
+                label = stringResource(id = R.string.arrival_date),
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -187,7 +215,7 @@ fun travelForm(
                     arrivalPlace = it
                     viewModel.fetchArrivalCitySuggestions(it)
                 },
-                label = "Varış Yeri",
+                label = stringResource(id = R.string.arrival_place),
                 citySuggestions = (arrivalCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
                 onCitySelected = { city ->
                     arrivalPlace =
@@ -250,7 +278,7 @@ fun travelForm(
                         disabledContentColor = Color.White.copy(alpha = 0.5f),
                     ),
             ) {
-                Text(text = "Devam Et", style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(id = R.string.continue_text), style = MaterialTheme.typography.bodyLarge)
             }
         }
     }
@@ -271,30 +299,28 @@ fun datePickerField(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .shadow(2.dp, RoundedCornerShape(12.dp))
+                .height(
+                    56.dp,
+                ).shadow(2.dp, RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
-                .clickable { showDialog = true },
+                .clickable {
+                    showDialog =
+                        true
+                },
     ) {
         if (value.isEmpty()) {
             Text(
                 text = label,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier =
-                    Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 16.dp),
+                modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp),
             )
         } else {
             Text(
                 text = value,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier =
-                    Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 16.dp),
+                modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp),
             )
         }
     }
@@ -312,14 +338,12 @@ fun datePickerField(
                         showDialog = false
                     },
                 ) {
-                    Text("OK")
+                    Text(stringResource(id = R.string.ok))
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { showDialog = false },
-                ) {
-                    Text("Cancel")
+                TextButton(onClick = { showDialog = false }) {
+                    Text(stringResource(id = R.string.cancel))
                 }
             },
         ) {
@@ -342,6 +366,10 @@ fun customCityField(
     var expanded by remember { mutableStateOf(false) }
     var selectedCityText by remember { mutableStateOf(value) }
 
+    val logTag = stringResource(id = R.string.custom_city_field_log_tag)
+    val querySuggestionsString = stringResource(id = R.string.query_suggestions)
+    val cityClickedString = stringResource(id = R.string.city_clicked)
+
     LaunchedEffect(loadingState) {
         expanded = loadingState is TravelViewModel.LoadingState.Loaded && loadingState.data.isNotEmpty()
     }
@@ -352,8 +380,9 @@ fun customCityField(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .shadow(2.dp, RoundedCornerShape(12.dp))
+                .height(
+                    56.dp,
+                ).shadow(2.dp, RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
     ) {
         TextField(
@@ -361,13 +390,10 @@ fun customCityField(
             onValueChange = { text ->
                 selectedCityText = text
                 onValueChange(text)
-                Log.d("CustomCityField", "Query: $text, Suggestions count: ${citySuggestions.size}")
+                Log.d(logTag, "$querySuggestionsString: $text, ${citySuggestions.size}")
             },
             label = { Text(label) },
-            modifier =
-                Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryEditable)
-                    .fillMaxWidth(),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth(),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors =
                 ExposedDropdownMenuDefaults.textFieldColors(
@@ -413,7 +439,7 @@ fun customCityField(
                                     } else {
                                         city.name + " - " + city.country
                                     }
-                                Log.d("CustomCityField", "City clicked: ${city.name}")
+                                Log.d(logTag, "$cityClickedString: ${city.name}")
                                 expanded = false
                             },
                         )
@@ -434,7 +460,13 @@ fun travelMethodDropdown(
     onMethodSelected: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val travelMethods = listOf("Otobüs", "Uçak", "Tren", "Araba")
+    val travelMethods =
+        listOf(
+            stringResource(id = R.string.bus),
+            stringResource(id = R.string.plane),
+            stringResource(id = R.string.train),
+            stringResource(id = R.string.car),
+        )
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -442,8 +474,10 @@ fun travelMethodDropdown(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .shadow(2.dp, RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
+                .shadow(
+                    2.dp,
+                    RoundedCornerShape(12.dp),
+                ).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
     ) {
         TextField(
             value = selectedMethod,
@@ -451,19 +485,14 @@ fun travelMethodDropdown(
             readOnly = true,
             label = {
                 Text(
-                    text = "Seyahat Vasıtası",
+                    text = stringResource(id = R.string.travel_method),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier =
-                Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth(),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors =
                 ExposedDropdownMenuDefaults.textFieldColors(

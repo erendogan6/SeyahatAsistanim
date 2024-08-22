@@ -1,0 +1,135 @@
+<resources>
+    <string name="app_name">SeyahatAsistanım</string>
+    <string name="chat_with_gpt">ChatGPT ile Etkileşim</string>
+    <string name="write_message">Mesajınızı yazın</string>
+    <string name="send">Gönder</string>
+    <string name="error_prefix">Hata: %1$s</string>
+    <string name="checklist_title">Kontrol Listesi</string>
+    <string name="no_checklist_items">Kontrol listesi öğesi bulunamadı.</string>
+    <string name="add_new_item">Yeni öğe ekle</string>
+    <string name="add">Ekle</string>
+    <string name="complete">Tamamla</string>
+    <string name="delete">Sil</string>
+    <string name="app_logo">Uygulama Logosu</string>
+    <string name="weather_details">Hava Durumu Detayları</string>
+    <string name="checklist">Kontrol Listesi</string>
+    <string name="local_info">Yerel Bilgiler</string>
+    <string name="chat_gpt_interaction">ChatGPT ile Etkileşim</string>
+    <string name="new_travel">Yeni Seyahat</string>
+    <string name="error">Hata: %1$s</string>
+    <string name="lottie_log_tag">LottieYuklemeEkrani</string>
+    <string name="loading_animation_requested">Animasyon kompozisyonu yükleniyor</string>
+    <string name="animation_loaded">Animasyon kompozisyonu başarıyla yüklendi, animasyon başlıyor</string>
+    <string name="animation_load_failed">Animasyon kompozisyonu yüklenemedi, animasyon başlamayacak</string>
+    <string name="travel_info_screen_log_tag">SeyahatBilgiEkrani</string>
+    <string name="loading_state_changed">LaunchedEffect: Yükleme durumu değişti: %1$s</string>
+    <string name="rendering_ui_with_loading">Kutu: UI, isLoading ile işleniyor: %1$s</string>
+    <string name="displaying_loading_animation">Kutu: Yükleme animasyonu gösteriliyor</string>
+    <string name="displaying_travel_form">Kutu: Seyahat formu gösteriliyor</string>
+    <string name="enter_travel_info">Lütfen Seyahat Bilgilerini Girin</string>
+    <string name="departure_place">Kalkış Yeri</string>
+    <string name="arrival_place">Varış Yeri</string>
+    <string name="travel_method">Seyahat Vasıtası</string>
+    <string name="bus">Otobüs</string>
+    <string name="plane">Uçak</string>
+    <string name="train">Tren</string>
+    <string name="car">Araba</string>
+    <string name="continue_text">Devam Et</string>
+    <string name="custom_city_field_log_tag">ÖzelŞehirAlanı</string>
+    <string name="query_suggestions">Sorgu: %1$s, Önerilen şehir sayısı: %2$d</string>
+    <string name="city_clicked">Tıklanan şehir: %1$s</string>
+    <string name="ok">Tamam</string>
+    <string name="cancel">İptal</string>
+    <string name="unknown_location">Bilinmeyen Konum</string>
+    <string name="weather_data_unavailable">Hava Durumu Verisi Yüklenemedi.</string>
+    <string name="day">Gündüz:</string>
+    <string name="night">Gece:</string>
+    <string name="date">Tarih</string>
+    <string name="temperature_day">Sıcaklık (Gündüz)</string>
+    <string name="temperature_night">Sıcaklık (Gece)</string>
+    <string name="weather_conditions">Hava Durumu</string>
+    <string name="failed_to_load_conversation">Konuşma yüklenemedi: %1$s</string>
+    <string name="failed_to_send_message">Mesaj gönderilemedi: %1$s</string>
+    <string name="travel_details">Seyahat bilgileri</string>
+    <string name="departure_location">Kalkış Yeri</string>
+    <string name="departure_date">Kalkış Tarihi</string>
+    <string name="arrival_location">Varış Yeri</string>
+    <string name="arrival_date">Varış Tarihi</string>
+    <string name="user_message">Kullanıcı mesajı</string>
+    <string name="provide_helpful_information">Lütfen bu seyahat bağlamında kullanıcıya yardımcı olacak bilgiler sağlayın.</string>
+    <string name="fetching_local_info">Hedef için yerel bilgiler getiriliyor: %1$s</string>
+    <string name="local_info_found_in_db">Hedef için yerel bilgi DB\'de bulundu: %1$s</string>
+    <string name="no_local_info_found">DB\'de %1$s için yerel bilgi bulunamadı, API isteği yapılıyor.</string>
+    <string name="local_info_saved_to_db">%1$s için yerel bilgi DB\'ye başarıyla kaydedildi.</string>
+    <string name="received_empty_response">%1$s için boş yanıt alındı.</string>
+    <string name="error_fetching_local_info">%1$s için yerel bilgi alınırken hata oluştu: %2$s</string>
+    <string name="finished_processing_local_info">%1$s için yerel bilgi işleme tamamlandı, yükleme tamamlandı.</string>
+    <string name="generating_checklist">Hedef için kontrol listesi oluşturuluyor: %1$s</string>
+    <string name="based_on_travel_details">Aşağıdaki seyahat bilgilerine göre</string>
+    <string name="weather_forecast_for_next_7_days">Gelecek 7 gün için hava durumu tahmini</string>
+    <string name="checklist_generated_and_saved">%1$s için oluşturulan kontrol listesi DB\'ye kaydedildi.</string>
+    <string name="error_generating_checklist">%1$s için kontrol listesi oluşturulurken hata oluştu: %2$s</string>
+    <string name="finished_generating_checklist">%1$s için kontrol listesi oluşturma tamamlandı, yükleme tamamlandı.</string>
+    <string name="checklist_items_saved_to_db">Kontrol listesi öğeleri yerel veritabanına kaydedildi.</string>
+    <string name="loading_checklist_items">Veritabanından kontrol listesi öğeleri yükleniyor.</string>
+    <string name="checklist_items_loaded_from_db">Veritabanından kontrol listesi öğeleri yüklendi.</string>
+    <string name="error_loading_checklist_items">Veritabanından kontrol listesi öğeleri yüklenirken hata oluştu: %1$s</string>
+    <string name="adding_new_checklist_item">Yeni kontrol listesi öğesi ekleniyor: %1$s</string>
+    <string name="new_checklist_item_added">Yeni kontrol listesi öğesi eklendi ve kontrol listesi yeniden yüklendi.</string>
+    <string name="error_adding_checklist_item">Kontrol listesi öğesi eklenirken hata oluştu: %1$s</string>
+    <string name="deleting_checklist_item">Kontrol listesi öğesi siliniyor: %1$d</string>
+    <string name="checklist_item_deleted">Kontrol listesi öğesi silindi ve kontrol listesi yeniden yüklendi.</string>
+    <string name="error_deleting_checklist_item">Kontrol listesi öğesi silinirken hata oluştu: %1$d, %2$s</string>
+    <string name="toggling_completion_status">Kontrol listesi öğesinin tamamlanma durumu değiştiriliyor: %1$d</string>
+    <string name="completion_status_toggled">Tamamlanma durumu değiştirildi ve kontrol listesi yeniden yüklendi.</string>
+    <string name="error_toggling_completion_status">Kontrol listesi öğesinin tamamlanma durumu değiştirilirken hata oluştu: %1$d, %2$s</string>
+    <string name="planning_trip_to">%1$s\'a bir seyahat planlıyorum</string>
+    <string name="can_you_provide_local_info">Ziyaretim sırasında bana faydalı olacak kapsamlı yerel bilgiler sağlayabilir misiniz?</string>
+    <string name="include_tips">Lütfen kültürel öne çıkanlar, tarihi yerler, popüler cazibe merkezleri, yerel mutfak, ulaşım seçenekleri ve %1$s\'deki deneyimimi geliştirebilecek diğer önemli ipuçlarını içeren bilgileri ekleyin. Ayrıca, konaklamam süresince dikkate almam gereken mevsimsel veya hava durumuyla ilgili tavsiyeleri de belirtin.</string>
+    <string name="started">Başladı</string>
+    <string name="travel_info_saved_to_db">Seyahat bilgisi veritabanına kaydedildi</string>
+    <string name="weather_data_received">Hava durumu verisi alındı: %1$s</string>
+    <string name="local_info_received">Yerel bilgi alındı: %1$s</string>
+    <string name="checklist_created">Checklist oluşturuldu: %1$s</string>
+    <string name="combined_loading_state">Birleşik isLoading durumu: %1$s</string>
+    <string name="all_processes_completed">Tüm işlemler tamamlandı, onTravelInfoSaved çağırıldı.</string>
+    <string name="unknown_error_occurred">Bilinmeyen bir hata oluştu.</string>
+    <string name="load_last_travel_info">Son seyahat bilgisi DB\'den yükleniyor</string>
+    <string name="last_travel_info_loaded">Son seyahat bilgisi yüklendi.</string>
+    <string name="delete_travel_info">Tüm seyahat bilgileri DB\'den siliniyor</string>
+    <string name="travel_info_deleted">Seyahat bilgisi silindi.</string>
+    <string name="fetch_departure_city_suggestions">%1$s için öneriler getiriliyor</string>
+    <string name="fetch_arrival_city_suggestions">%1$s için öneriler getiriliyor</string>
+    <string name="error_fetching_suggestions">Öneriler alınırken hata oluştu</string>
+    <string name="failed_to_load_suggestions">Öneriler yüklenemedi</string>
+    <string name="suggestions_received">Öneriler alındı: %1$d şehirler</string>
+    <string name="query_is_blank">Sorgu boş, öneri alınmadı</string>
+    <string name="skipping_api_call">API çağrısı atlanıyor. Seyahat tarihi (%1$s) 30 günden daha ileri bir tarihte.</string>
+    <string name="fetching_weather_data">Enlem: %1$s, boylam: %2$s için %3$s tarihli hava durumu verileri getiriliyor.</string>
+    <string name="error_fetching_weather_data_api">API\'den hava durumu verileri alınırken hata oluştu: %1$s. Veriler veritabanından yükleniyor.</string>
+    <string name="error_fetching_weather_data">Enlem: %1$s, boylam: %2$s için hava durumu verileri alınırken hata oluştu.</string>
+    <string name="weather_data_fetched">Hava durumu verileri başarıyla alındı ve StateFlow\'a kaydedildi.</string>
+    <string name="weather_data_saved_to_db">Hava durumu verileri başarıyla yerel veritabanına kaydedildi.</string>
+    <string name="loading_weather_data_from_db">%1$s için hava durumu verileri yerel veritabanından yükleniyor.</string>
+    <string name="weather_data_loaded_from_db">%1$s için hava durumu verileri veritabanından yüklendi.</string>
+    <string name="error_loading_weather_data">Veritabanından hava durumu verileri yüklenirken hata oluştu.</string>
+    <string name="welcome_message">🌍 Seyahat Asistanım\'a \nHoş Geldiniz! ✈️</string>
+    <string name="weather_summary_format">Tarih: %1$s, Sıcaklık: Gündüz %2$.1f°C, Gece %3$.1f°C, Hava Durumu: %4$s</string>
+    <string name="checklist_prompt_format">
+        Aşağıdaki seyahat bilgileri doğrultusunda, yanımda götürmem gereken öğelerin bir kontrol listesini oluşturun:
+        - Kalkış Yeri: %1$s
+        - Kalkış Tarihi: %2$s
+        - Varış Noktası: %3$s
+        - Varış Tarihi: %4$s
+        - Seyahat Yöntemi: %5$s
+        - Varıştan sonraki 7 gün için hava durumu tahmini:
+        %6$s
+
+        Lütfen aşağıdaki unsurlara dikkat ederek yanımda götürmem gereken öğelerin bir kontrol listesini oluşturun:
+        - Seyahat yöntemi (örneğin, uçak, tren, araba vb.) ile ilgili gerekli eşyalar
+        - Varış noktasındaki yerel koşullara uygun eşyalar
+        - Varış noktasındaki hava durumu koşullarına uygun eşyalar
+
+        Yanıtınızda yalnızca kontrol listesi öğelerini listeleyin ve başka açıklama veya bilgi vermeyin.
+    </string>
+</resources>

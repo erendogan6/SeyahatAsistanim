@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.erendogan6.seyahatasistanim.R
@@ -43,7 +44,7 @@ fun homeScreen(
     ) {
         Image(
             painter = painterResource(R.drawable.logo),
-            contentDescription = "App Logo",
+            contentDescription = stringResource(id = R.string.app_logo),
             modifier =
                 Modifier
                     .size(250.dp)
@@ -52,7 +53,7 @@ fun homeScreen(
         )
 
         Text(
-            text = "Seyahat Hazırlık Asistanı",
+            text = stringResource(id = R.string.app_name),
             style =
                 MaterialTheme.typography.headlineMedium.copy(
                     color = MaterialTheme.colorScheme.primary,
@@ -62,7 +63,7 @@ fun homeScreen(
         )
 
         buttonWithIcon(
-            text = "Hava Durumu Detayları",
+            text = stringResource(id = R.string.weather_details),
             iconResId = R.drawable.ic_cloud,
             onClick = onNavigateToWeather,
         )
@@ -70,7 +71,7 @@ fun homeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         buttonWithIcon(
-            text = "Kontrol Listesi",
+            text = stringResource(id = R.string.checklist),
             iconResId = R.drawable.ic_checklist,
             onClick = onNavigateToChecklist,
         )
@@ -78,7 +79,7 @@ fun homeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         buttonWithIcon(
-            text = "Yerel Bilgiler",
+            text = stringResource(id = R.string.local_info),
             iconResId = R.drawable.ic_info,
             onClick = onNavigateToLocalInfo,
         )
@@ -86,7 +87,7 @@ fun homeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         buttonWithIcon(
-            text = "ChatGPT ile Etkileşim",
+            text = stringResource(id = R.string.chat_gpt_interaction),
             iconResId = R.drawable.ic_chat,
             onClick = onNavigateToChatGpt,
         )
@@ -110,7 +111,7 @@ fun homeScreen(
             shape = MaterialTheme.shapes.medium,
             elevation = ButtonDefaults.buttonElevation(8.dp),
         ) {
-            Text(text = "Yeni Seyahat")
+            Text(text = stringResource(id = R.string.new_travel))
         }
     }
 }

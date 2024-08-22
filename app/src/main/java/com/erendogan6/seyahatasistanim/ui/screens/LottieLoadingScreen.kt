@@ -1,11 +1,13 @@
 package com.erendogan6.seyahatasistanim.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -21,20 +23,20 @@ fun lottieLoadingScreen(modifier: Modifier = Modifier) {
         iterations = LottieConstants.IterateForever,
     )
 
-    println("lottieLoadingScreen: Loading animation composition loaded")
+    Log.d(stringResource(id = R.string.lottie_log_tag), stringResource(id = R.string.loading_animation_requested))
 
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         if (composition != null) {
-            println("lottieLoadingScreen: Starting animation")
+            Log.d(stringResource(id = R.string.lottie_log_tag), stringResource(id = R.string.animation_loaded))
             LottieAnimation(
                 composition = composition,
                 progress = { progress },
             )
         } else {
-            println("lottieLoadingScreen: Composition is null, animation will not start")
+            Log.e(stringResource(id = R.string.lottie_log_tag), stringResource(id = R.string.animation_load_failed))
         }
     }
 }

@@ -42,10 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChecklistItemEntity
 import com.erendogan6.seyahatasistanim.ui.viewmodel.ChatGptViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -74,7 +76,7 @@ fun checklistScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Kontrol Listesi",
+                text = stringResource(id = R.string.checklist_title),
                 style =
                     MaterialTheme.typography.headlineMedium.copy(
                         fontSize = 30.sp,
@@ -89,7 +91,7 @@ fun checklistScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     Text(
-                        text = "Kontrol listesi öğesi bulunamadı.",
+                        text = stringResource(id = R.string.no_checklist_items),
                         style =
                             MaterialTheme.typography.bodyLarge.copy(
                                 color = MaterialTheme.colorScheme.error,
@@ -128,7 +130,7 @@ fun checklistScreen(
                                 MaterialTheme.colorScheme.surface,
                                 RoundedCornerShape(50),
                             ).padding(horizontal = 16.dp),
-                    placeholder = { Text(text = "Yeni öğe ekle") },
+                    placeholder = { Text(text = stringResource(id = R.string.add_new_item)) },
                     colors =
                         TextFieldDefaults.colors(
                             focusedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -160,7 +162,7 @@ fun checklistScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Ekle")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add))
                 }
             }
         }
@@ -220,12 +222,16 @@ fun checklistItemCard(
             IconButton(onClick = onCompleteClick) {
                 Icon(
                     Icons.Default.Done,
-                    contentDescription = "Tamamla",
+                    contentDescription = stringResource(id = R.string.complete),
                     tint = if (item.isCompleted) Color.Gray else MaterialTheme.colorScheme.secondary,
                 )
             }
             IconButton(onClick = onDeleteClick) {
-                Icon(Icons.Default.Delete, contentDescription = "Sil", tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.delete),
+                    tint = MaterialTheme.colorScheme.error,
+                )
             }
         }
     }

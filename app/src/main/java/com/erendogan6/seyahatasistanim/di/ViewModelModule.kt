@@ -8,12 +8,13 @@ import org.koin.dsl.module
 
 val viewModelModule =
     module {
-        viewModel { ChatGptViewModel(get(), get(), get()) }
-        viewModel { WeatherViewModel(get()) }
+        viewModel { ChatGptViewModel(chatGptRepository = get(), localInfoRepository = get(), checklistRepository = get(), context = get()) }
+        viewModel { WeatherViewModel(weatherRepository = get(), context = get()) }
         viewModel {
             TravelViewModel(
                 travelRepository = get(),
                 weatherRepository = get(),
+                context = get(),
             )
         }
     }
