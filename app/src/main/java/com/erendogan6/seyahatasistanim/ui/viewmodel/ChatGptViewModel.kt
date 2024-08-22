@@ -1,5 +1,6 @@
 package com.erendogan6.seyahatasistanim.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatGptRequest
@@ -38,34 +39,36 @@ class ChatGptViewModel(
     fun getSuggestions(prompt: String) {
         viewModelScope.launch {
             try {
-                val request =
-                    ChatGptRequest(
-                        messages = listOf(Message(role = "user", content = prompt)),
-                    )
+                Log.i("ChatGptViewModel", "Fetching suggestions for prompt: $prompt")
                 _isLoading.value = true
+                val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
                 chatGptRepository.getSuggestions(request).collect { response ->
                     _chatGptResponse.value = response
+                    Log.i("ChatGptViewModel", "Suggestions successfully fetched.")
                 }
-                _isLoading.value = false
             } catch (e: Exception) {
-                _error.value = e.message ?: "An error occurred"
+                val errorMsg = "Error fetching suggestions: ${e.message ?: "Unknown error"}"
+                _error.value = errorMsg
+                handleChatGPTError(e, errorMsg)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun getLocalInfoForDestination(destination: String) {
         viewModelScope.launch {
+            Log.i("ChatGptViewModel", "Fetching local info for destination: $destination")
             _isLoading.value = true
             try {
                 val localInfoFromDb = localInfoRepository.getLocalInfo(destination)
                 if (localInfoFromDb != null) {
+                    Log.i("ChatGptViewModel", "Local info found in DB for destination: $destination")
                     _localInfo.value = localInfoFromDb
                 } else {
-                    val prompt = "Provide detailed local information about $destination."
-                    val request =
-                        ChatGptRequest(
-                            messages = listOf(Message(role = "user", content = prompt)),
-                        )
+                    Log.i("ChatGptViewModel", "No local info found in DB for $destination, making API request.")
+                    val prompt = createLocalInfoPrompt(destination)
+                    val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
                     chatGptRepository.getSuggestions(request).collect { response ->
                         val localInfoContent =
                             response.choices
@@ -76,13 +79,19 @@ class ChatGptViewModel(
                             val localInfo = LocalInfoEntity(destination = destination, info = localInfoContent)
                             saveLocalInfoToDatabase(localInfo)
                             _localInfo.value = localInfo
+                            Log.i("ChatGptViewModel", "Local info for $destination successfully saved to DB.")
+                        } else {
+                            Log.w("ChatGptViewModel", "Received empty response for $destination.")
                         }
                     }
                 }
             } catch (e: Exception) {
-                _error.value = e.message ?: "An error occurred"
+                val errorMsg = "Error fetching local info for $destination: ${e.message ?: "Unknown error"}"
+                _error.value = errorMsg
+                handleChatGPTError(e, errorMsg)
             } finally {
                 _isLoading.value = false
+                Log.i("ChatGptViewModel", "Finished processing local info for $destination, loading set to false.")
             }
         }
     }
@@ -96,21 +105,11 @@ class ChatGptViewModel(
         travelMethod: String,
     ) {
         viewModelScope.launch {
+            Log.i("ChatGptViewModel", "Generating checklist for destination: $destination")
+            val prompt = createChecklistPrompt(departureLocation, departureDate, destination, arrivalDate, weatherData, travelMethod)
+            val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
+            _isLoading.value = true
             try {
-                val prompt =
-                    createChecklistPrompt(
-                        departureLocation,
-                        departureDate,
-                        destination,
-                        arrivalDate,
-                        weatherData,
-                        travelMethod,
-                    )
-                val request =
-                    ChatGptRequest(
-                        messages = listOf(Message(role = "user", content = prompt)),
-                    )
-                _isLoading.value = true
                 chatGptRepository.getSuggestions(request).collect { response ->
                     val checklistItems =
                         response.choices
@@ -124,10 +123,15 @@ class ChatGptViewModel(
 
                     _checklistItems.value = checklistItems.map { ChecklistItemEntity(item = it) }
                     saveChecklistToDatabase(checklistItems)
+                    Log.i("ChatGptViewModel", "Checklist generated and saved to DB for $destination.")
                 }
-                _isLoading.value = false
             } catch (e: Exception) {
-                _error.value = e.message ?: "An error occurred"
+                val errorMsg = "Error generating checklist for $destination: ${e.message ?: "Unknown error"}"
+                _error.value = errorMsg
+                handleChatGPTError(e, errorMsg)
+            } finally {
+                _isLoading.value = false
+                Log.i("ChatGptViewModel", "Finished generating checklist for $destination, loading set to false.")
             }
         }
     }
@@ -167,42 +171,84 @@ class ChatGptViewModel(
     private suspend fun saveChecklistToDatabase(items: List<String>) {
         val checklistItems = items.map { ChecklistItemEntity(item = it) }
         checklistRepository.saveChecklistItems(checklistItems)
+        Log.i("ChatGptViewModel", "Checklist items saved to local database.")
     }
 
     private suspend fun saveLocalInfoToDatabase(localInfo: LocalInfoEntity) {
         localInfoRepository.saveLocalInfo(localInfo)
+        Log.i("ChatGptViewModel", "Local info saved to local database.")
     }
 
     fun loadChecklistItems() {
         viewModelScope.launch {
             try {
+                Log.i("ChatGptViewModel", "Loading checklist items from database.")
                 val checklistItemsFromDb = checklistRepository.getAllChecklistItems()
                 _checklistItems.value = checklistItemsFromDb.map { it }
+                Log.i("ChatGptViewModel", "Checklist items loaded from database.")
             } catch (e: Exception) {
-                _error.value = e.message ?: "An error occurred while loading checklist items."
+                val errorMsg = "Error loading checklist items from database: ${e.message ?: "Unknown error"}"
+                _error.value = errorMsg
+                handleChatGPTError(e, errorMsg)
             }
         }
     }
 
     fun addChecklistItem(item: String) {
         viewModelScope.launch {
-            val newItem = ChecklistItemEntity(item = item)
-            checklistRepository.saveChecklistItems(listOf(newItem))
-            loadChecklistItems()
+            Log.i("ChatGptViewModel", "Adding new checklist item: $item")
+            try {
+                val newItem = ChecklistItemEntity(item = item)
+                checklistRepository.saveChecklistItems(listOf(newItem))
+                loadChecklistItems()
+                Log.i("ChatGptViewModel", "New checklist item added and checklist reloaded.")
+            } catch (e: Exception) {
+                val errorMsg = "Error adding checklist item: ${e.message ?: "Unknown error"}"
+                _error.value = errorMsg
+                handleChatGPTError(e, errorMsg)
+            }
         }
     }
 
     fun deleteChecklistItem(id: Int) {
         viewModelScope.launch {
-            checklistRepository.deleteChecklistItem(id)
-            loadChecklistItems()
+            Log.i("ChatGptViewModel", "Deleting checklist item with ID: $id")
+            try {
+                checklistRepository.deleteChecklistItem(id)
+                loadChecklistItems()
+                Log.i("ChatGptViewModel", "Checklist item deleted and checklist reloaded.")
+            } catch (e: Exception) {
+                val errorMsg = "Error deleting checklist item with ID $id: ${e.message ?: "Unknown error"}"
+                _error.value = errorMsg
+                handleChatGPTError(e, errorMsg)
+            }
         }
     }
 
     fun toggleItemCompletion(id: Int) {
         viewModelScope.launch {
-            checklistRepository.toggleChecklistItemCompletion(id)
-            loadChecklistItems()
+            Log.i("ChatGptViewModel", "Toggling completion status for checklist item with ID: $id")
+            try {
+                checklistRepository.toggleChecklistItemCompletion(id)
+                loadChecklistItems()
+                Log.i("ChatGptViewModel", "Completion status toggled and checklist reloaded.")
+            } catch (e: Exception) {
+                val errorMsg = "Error toggling completion status for checklist item with ID $id: ${e.message ?: "Unknown error"}"
+                _error.value = errorMsg
+                handleChatGPTError(e, errorMsg)
+            }
         }
+    }
+
+    private fun createLocalInfoPrompt(destination: String): String =
+        """
+        $destination'a bir seyahat planlıyorum. Ziyaretim sırasında bana faydalı olacak kapsamlı yerel bilgiler sağlayabilir misiniz? Lütfen kültürel öne çıkanlar, tarihi yerler, popüler cazibe merkezleri, yerel mutfak, ulaşım seçenekleri ve $destination'daki deneyimimi geliştirebilecek diğer önemli ipuçlarını içeren bilgileri ekleyin. Ayrıca, konaklamam süresince dikkate almam gereken mevsimsel veya hava durumuyla ilgili tavsiyeleri de belirtin.
+        """.trimIndent()
+
+    private fun handleChatGPTError(
+        error: Throwable,
+        customMessage: String,
+    ) {
+        Log.e("ChatGptViewModel", "$customMessage - ${error.message}")
     }
 }
