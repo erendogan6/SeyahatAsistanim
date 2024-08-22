@@ -129,6 +129,18 @@ class TravelViewModel(
                 }
             }
         }
+
+        viewModelScope.launch {
+            chatGptViewModel.checklistItems.collect { checklistItems ->
+                checklistItems.let {
+                    Log.d(
+                        "TravelViewModel",
+                        "Checklist oluşturuldu: $checklistItems",
+                    )
+                    _isChecklistLoading.value = false
+                }
+            }
+        }
     }
 
     private fun initiateChecklistGeneration(
@@ -241,7 +253,7 @@ class TravelViewModel(
         }
     }
 
-    fun handleTravelError(
+    private fun handleTravelError(
         error: Throwable,
         customMessage: String,
     ) {
