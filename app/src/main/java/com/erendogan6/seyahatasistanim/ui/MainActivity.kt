@@ -3,25 +3,18 @@ package com.erendogan6.seyahatasistanim.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.ui.screens.appNavigation
+import com.erendogan6.seyahatasistanim.ui.screens.lottieLoadingScreen
 import com.erendogan6.seyahatasistanim.ui.theme.seyahatAsistanimTheme
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
 import kotlinx.coroutines.delay
@@ -55,7 +48,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (isLoading) {
-                    lottieLoadingScreen(animationResId = R.raw.animation)
+                    lottieLoadingScreen()
                 } else {
                     startDestination?.let {
                         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -69,24 +62,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun lottieLoadingScreen(
-    animationResId: Int,
-    modifier: Modifier = Modifier,
-) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(animationResId))
-    val progress by animateLottieCompositionAsState(composition)
-
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        LottieAnimation(
-            composition = composition,
-            progress = { progress },
-        )
     }
 }
