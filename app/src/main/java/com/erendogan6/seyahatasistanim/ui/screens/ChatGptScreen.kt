@@ -38,17 +38,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.erendogan6.seyahatasistanim.ui.viewmodel.ChatGptViewModel
+import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun chatGptScreen(
     modifier: Modifier = Modifier,
     chatGptViewModel: ChatGptViewModel = koinViewModel(),
+    travelViewModel: TravelViewModel = koinViewModel(),
 ) {
+    val travelInfo by travelViewModel.travelInfo.collectAsState()
     var userInput by remember { mutableStateOf("") }
-    val chatGptResponse by chatGptViewModel.chatGptResponse.collectAsState()
+    val conversation by chatGptViewModel.conversation.collectAsState()
     val error by chatGptViewModel.error.collectAsState()
     val isLoading by chatGptViewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
@@ -70,7 +77,6 @@ fun chatGptScreen(
                     .fillMaxSize()
                     .padding(16.dp),
         ) {
-            // Başlık
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 16.dp),
@@ -89,7 +95,6 @@ fun chatGptScreen(
                 )
             }
 
-            // Mesaj Listesi
             LazyColumn(
                 state = listState,
                 modifier =
@@ -97,24 +102,21 @@ fun chatGptScreen(
                         .weight(1f)
                         .fillMaxWidth(),
             ) {
-                chatGptResponse?.let { response ->
-                    items(response.choices) { choice ->
-                        messageBubble(
-                            message = choice.message.content,
-                            isUserMessage = false,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+                items(conversation) { message ->
+                    messageBubble(
+                        message = message.content,
+                        isUserMessage = message.role == "user",
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
-            // Hata veya Yükleniyor göstergesi
-            when {
-                isLoading -> loadingAnimation()
-                error != null -> errorMessage(error = error!!)
+            if (isLoading) {
+                loadingAnimation()
+            } else if (error != null) {
+                errorMessage(error = error!!)
             }
 
-            // Mesaj Giriş Alanı
             Row(
                 modifier =
                     Modifier
@@ -146,8 +148,14 @@ fun chatGptScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 FloatingActionButton(
                     onClick = {
-                        if (userInput.isNotBlank()) {
-                            chatGptViewModel.getLocalInfoForDestination(destination = userInput)
+                        if (userInput.isNotBlank() && travelInfo != null) {
+                            chatGptViewModel.sendMessage(
+                                userMessage = userInput,
+                                departureLocation = travelInfo!!.departurePlace,
+                                departureDate = travelInfo!!.departureDate,
+                                arrivalLocation = travelInfo!!.arrivalPlace,
+                                arrivalDate = travelInfo!!.arrivalDate,
+                            )
                             userInput = ""
                         }
                     },
@@ -189,10 +197,16 @@ fun messageBubble(
                     .align(if (isUserMessage) Alignment.CenterEnd else Alignment.CenterStart)
                     .widthIn(max = 300.dp),
         ) {
-            Text(
-                text = message,
+            MarkdownText(
+                markdown = message,
                 modifier = Modifier.padding(12.dp),
-                style = MaterialTheme.typography.bodyMedium,
+                style =
+                    TextStyle(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        textAlign = TextAlign.Start,
+                    ),
             )
         }
     }

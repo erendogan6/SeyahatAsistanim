@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,7 +50,6 @@ import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChecklistItemEntity
 import com.erendogan6.seyahatasistanim.ui.viewmodel.ChatGptViewModel
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun checklistScreen(
     modifier: Modifier = Modifier,
@@ -73,7 +71,7 @@ fun checklistScreen(
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "Kontrol Listesi",
@@ -175,12 +173,11 @@ fun checklistItemCard(
     onDeleteClick: () -> Unit,
     onCompleteClick: () -> Unit,
 ) {
-    val backgroundColor =
-        if (item.isCompleted) {
-            MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-        } else {
-            MaterialTheme.colorScheme.surface
-        }
+    if (item.isCompleted) {
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
     val cardElevation by animateFloatAsState(targetValue = if (item.isCompleted) 2.dp.value else 6.dp.value)
 
     Card(
