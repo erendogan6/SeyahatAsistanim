@@ -9,6 +9,8 @@ private val LightColorScheme =
         primary = Blue80,
         secondary = BlueGrey80,
         tertiary = Green80,
+        background = LightBlueBackground,
+        surface = surfaceColor,
     )
 
 @Composable
