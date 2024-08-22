@@ -4,11 +4,6 @@ import com.erendogan6.seyahatasistanim.BuildConfig
 import com.erendogan6.seyahatasistanim.data.remote.ChatGptApiService
 import com.erendogan6.seyahatasistanim.data.remote.CityApiService
 import com.erendogan6.seyahatasistanim.data.remote.WeatherApiService
-import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepository
-import com.erendogan6.seyahatasistanim.data.repository.ChecklistRepository
-import com.erendogan6.seyahatasistanim.data.repository.LocalInfoRepository
-import com.erendogan6.seyahatasistanim.data.repository.TravelRepository
-import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.qualifier.named
@@ -90,35 +85,4 @@ val networkModule =
         single { get<Retrofit>(named("weatherRetrofit")).create(WeatherApiService::class.java) }
         single { get<Retrofit>(named("chatGptRetrofit")).create(ChatGptApiService::class.java) }
         single { get<Retrofit>(named("cityRetrofit")).create(CityApiService::class.java) }
-
-        single {
-            WeatherRepository(
-                weatherApiService = get(),
-                cityApiService = get(),
-                weatherDao = get(),
-            )
-        }
-
-        single {
-            ChatGptRepository(get())
-        }
-
-        single {
-            TravelRepository(
-                travelDao = get(),
-                cityApiService = get(),
-            )
-        }
-
-        single {
-            LocalInfoRepository(
-                localInfoDao = get(),
-            )
-        }
-
-        single {
-            ChecklistRepository(
-                checklistDao = get(),
-            )
-        }
     }
