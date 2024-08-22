@@ -230,7 +230,6 @@ fun travelForm(
                             chatGptViewModel,
                             weatherViewModel,
                         ) {
-                            // Navigate to home after everything is done
                             navController.navigate("home")
                         }
                     }
@@ -247,8 +246,8 @@ fun travelForm(
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = Color.White,
-                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                        disabledContentColor = Color.White.copy(alpha = 0.3f),
+                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        disabledContentColor = Color.White.copy(alpha = 0.5f),
                     ),
             ) {
                 Text(text = "Devam Et", style = MaterialTheme.typography.bodyLarge)
@@ -350,7 +349,12 @@ fun customCityField(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = modifier,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .shadow(2.dp, RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
     ) {
         TextField(
             value = selectedCityText,
@@ -365,7 +369,23 @@ fun customCityField(
                     .menuAnchor(MenuAnchorType.PrimaryEditable)
                     .fillMaxWidth(),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            colors =
+                ExposedDropdownMenuDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    errorLabelColor = Color.Transparent,
+                    cursorColor = Color.Transparent,
+                    focusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    errorTrailingIconColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                ),
         )
 
         when (loadingState) {
@@ -419,6 +439,11 @@ fun travelMethodDropdown(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(2.dp, RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
     ) {
         TextField(
             value = selectedMethod,
@@ -438,10 +463,25 @@ fun travelMethodDropdown(
             modifier =
                 Modifier
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp)
-                    .shadow(2.dp, RoundedCornerShape(12.dp)),
+                    .fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
+            colors =
+                ExposedDropdownMenuDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    errorLabelColor = Color.Transparent,
+                    cursorColor = Color.Transparent,
+                    focusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    errorTrailingIconColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                ),
         )
 
         ExposedDropdownMenu(
