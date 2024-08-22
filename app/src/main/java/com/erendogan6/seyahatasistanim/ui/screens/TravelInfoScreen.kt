@@ -57,6 +57,40 @@ fun travelInfoScreen(
     chatGptViewModel: ChatGptViewModel = koinViewModel(),
     weatherViewModel: WeatherViewModel = koinViewModel(),
 ) {
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    LaunchedEffect(isLoading) {
+        Log.d("travelInfoScreen", "LaunchedEffect: isLoading changed to $isLoading")
+    }
+
+    Box(
+        modifier =
+            Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Log.d("travelInfoScreen", "Box: Rendering UI with isLoading = $isLoading")
+        if (isLoading) {
+            Log.d("travelInfoScreen", "Box: Displaying loading animation")
+            lottieLoadingScreen()
+        } else {
+            Log.d("travelInfoScreen", "Box: Displaying travel form")
+            travelForm(
+                viewModel = viewModel,
+                chatGptViewModel = chatGptViewModel,
+                weatherViewModel = weatherViewModel,
+                navController = navController,
+            )
+        }
+    }
+}
+
+@Composable
+fun travelForm(
+    viewModel: TravelViewModel,
+    chatGptViewModel: ChatGptViewModel,
+    weatherViewModel: WeatherViewModel,
+    navController: NavController,
+) {
     var departureDate by remember { mutableStateOf("") }
     var arrivalDate by remember { mutableStateOf("") }
     var departurePlace by remember { mutableStateOf("") }
@@ -132,7 +166,6 @@ fun travelInfoScreen(
 
                     departureLatitude = city.latitude
                     departureLongitude = city.longitude
-                    println(city.latitude)
                 },
                 loadingState = departureCityLoadingState,
             )
@@ -192,8 +225,14 @@ fun travelInfoScreen(
                                 arrivalLatitude = arrivalLatitude ?: 0.0,
                                 arrivalLongitude = arrivalLongitude ?: 0.0,
                             )
-                        viewModel.saveTravelInfo(travelEntity, chatGptViewModel, weatherViewModel)
-                        navController.navigate("home")
+                        viewModel.saveTravelInfo(
+                            travelEntity,
+                            chatGptViewModel,
+                            weatherViewModel,
+                        ) {
+                            // Navigate to home after everything is done
+                            navController.navigate("home")
+                        }
                     }
                 },
                 enabled = isFormValid,
@@ -304,7 +343,6 @@ fun customCityField(
     var expanded by remember { mutableStateOf(false) }
     var selectedCityText by remember { mutableStateOf(value) }
 
-    // Watch for changes in loadingState to control the dropdown expansion
     LaunchedEffect(loadingState) {
         expanded = loadingState is TravelViewModel.LoadingState.Loaded && loadingState.data.isNotEmpty()
     }
