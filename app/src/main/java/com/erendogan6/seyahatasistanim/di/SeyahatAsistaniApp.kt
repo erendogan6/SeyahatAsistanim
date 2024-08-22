@@ -14,6 +14,7 @@ class SeyahatAsistaniApp : Application() {
                     networkModule,
                     viewModelModule,
                     databaseModule,
+                    repositoryModule,
                 ),
             )
         }
