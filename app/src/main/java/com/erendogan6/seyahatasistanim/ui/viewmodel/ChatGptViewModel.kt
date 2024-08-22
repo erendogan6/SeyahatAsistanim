@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatGptRequest
-import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatGptResponse
+import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatMessageEntity
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChecklistItemEntity
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.LocalInfoEntity
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.Message
@@ -21,9 +21,6 @@ class ChatGptViewModel(
     private val localInfoRepository: LocalInfoRepository,
     private val checklistRepository: ChecklistRepository,
 ) : ViewModel() {
-    private val _chatGptResponse = MutableStateFlow<ChatGptResponse?>(null)
-    val chatGptResponse: StateFlow<ChatGptResponse?> = _chatGptResponse
-
     private val _localInfo = MutableStateFlow<LocalInfoEntity?>(null)
     val localInfo: StateFlow<LocalInfoEntity?> = _localInfo
 
@@ -36,25 +33,81 @@ class ChatGptViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun getSuggestions(prompt: String) {
+    private val _conversation = MutableStateFlow<List<ChatMessageEntity>>(emptyList())
+    val conversation: StateFlow<List<ChatMessageEntity>> = _conversation
+
+    init {
+        loadConversation()
+    }
+
+    private fun loadConversation() {
         viewModelScope.launch {
             try {
-                Log.i("ChatGptViewModel", "Fetching suggestions for prompt: $prompt")
+                val messages = chatGptRepository.getAllChatMessages()
+                _conversation.value = messages
+            } catch (e: Exception) {
+                _error.value = "Failed to load conversation: ${e.message}"
+            }
+        }
+    }
+
+    fun sendMessage(
+        userMessage: String,
+        departureLocation: String,
+        departureDate: String,
+        arrivalLocation: String,
+        arrivalDate: String,
+    ) {
+        viewModelScope.launch {
+            try {
                 _isLoading.value = true
+
+                val userMessageEntity = ChatMessageEntity(content = userMessage, role = "user")
+                chatGptRepository.saveChatMessage(userMessageEntity)
+                _conversation.value += userMessageEntity
+
+                val prompt = createPrompt(userMessage, departureLocation, departureDate, arrivalLocation, arrivalDate)
                 val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
+
                 chatGptRepository.getSuggestions(request).collect { response ->
-                    _chatGptResponse.value = response
-                    Log.i("ChatGptViewModel", "Suggestions successfully fetched.")
+                    val assistantMessage =
+                        response.choices
+                            .firstOrNull()
+                            ?.message
+                            ?.content
+                            .orEmpty()
+                    val assistantMessageEntity = ChatMessageEntity(content = assistantMessage, role = "assistant")
+
+                    chatGptRepository.saveChatMessage(assistantMessageEntity)
+                    _conversation.value += assistantMessageEntity
                 }
             } catch (e: Exception) {
-                val errorMsg = "Error fetching suggestions: ${e.message ?: "Unknown error"}"
-                _error.value = errorMsg
-                handleChatGPTError(e, errorMsg)
+                _error.value = "Failed to send message: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
     }
+
+    private fun createPrompt(
+        userMessage: String,
+        departureLocation: String,
+        departureDate: String,
+        arrivalLocation: String,
+        arrivalDate: String,
+    ): String =
+        """
+        Seyahat bilgileri:
+        - Kalkış Yeri: $departureLocation
+        - Kalkış Tarihi: $departureDate
+        - Varış Yeri: $arrivalLocation
+        - Varış Tarihi: $arrivalDate
+
+        Kullanıcı mesajı:
+        $userMessage
+
+        Lütfen bu seyahat bağlamında kullanıcıya yardımcı olacak bilgiler sağlayın.
+        """.trimIndent()
 
     fun getLocalInfoForDestination(destination: String) {
         viewModelScope.launch {
