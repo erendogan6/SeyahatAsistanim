@@ -1,10 +1,14 @@
 package com.erendogan6.seyahatasistanim.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.weather.WeatherForecast
 import com.erendogan6.seyahatasistanim.ui.viewmodel.TravelViewModel
@@ -58,6 +63,7 @@ fun weatherDetailScreen(
 
     val lat = travelInfo?.arrivalLatitude ?: 0.0
     val lon = travelInfo?.arrivalLongitude ?: 0.0
+    val arrivalLocation = travelInfo?.arrivalPlace ?: "Bilinmeyen Lokasyon"
 
     val weatherData by viewModel.weatherData.collectAsState()
     val weatherFromDb by viewModel.weatherFromDb.collectAsState()
@@ -90,6 +96,18 @@ fun weatherDetailScreen(
                     MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
+                        fontSize = 28.sp,
+                    ),
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+
+            Text(
+                text = arrivalLocation,
+                style =
+                    MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 20.sp,
                     ),
                 modifier = Modifier.padding(bottom = 24.dp),
             )
@@ -97,18 +115,23 @@ fun weatherDetailScreen(
             weatherData?.let { data ->
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(data.forecastList) { weatherForecast ->
                         weatherForecastCard(weatherForecast = weatherForecast)
                     }
                 }
             } ?: run {
-                Text(
-                    text = "Hava durumu verisi yükleniyor...",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(16.dp),
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Hava durumu verisi yükleniyor...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
             }
         }
     }
@@ -126,28 +149,24 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
     val formattedDate = localDateTime.format(formatter)
 
     Card(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+        modifier = Modifier.fillMaxWidth(),
         colors =
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(20.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_calendar),
                     contentDescription = "Date Icon",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(36.dp),
                 )
                 Text(
                     text = formattedDate,
@@ -155,19 +174,27 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                         MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
+                            fontSize = 22.sp,
                         ),
-                    modifier = Modifier.padding(start = 8.dp),
+                    modifier = Modifier.padding(start = 12.dp),
                 )
             }
+            Spacer(
+                modifier =
+                    Modifier
+                        .padding(top = 8.dp)
+                        .height(1.dp)
+                        .fillMaxWidth(),
+            )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
                     text = "Gündüz:",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                 )
                 Text(
                     text = "${weatherForecast.temp.day}°C",
@@ -179,14 +206,23 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                 )
             }
 
+            Spacer(
+                modifier =
+                    Modifier
+                        .padding(top = 8.dp, bottom = 16.dp)
+                        .background(Color.Black)
+                        .height(1.dp)
+                        .fillMaxWidth(),
+            )
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
                     text = "Gece:",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                 )
                 Text(
                     text = "${weatherForecast.temp.night}°C",
@@ -197,6 +233,14 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                         ),
                 )
             }
+            Spacer(
+                modifier =
+                    Modifier
+                        .padding(top = 8.dp, bottom = 16.dp)
+                        .background(Color.Black)
+                        .height(1.dp)
+                        .fillMaxWidth(),
+            )
 
             weatherForecast.weather.firstOrNull()?.description?.capitalizeWords()?.let {
                 Row(
@@ -208,14 +252,15 @@ fun weatherForecastCard(weatherForecast: WeatherForecast) {
                         painter = painterResource(id = R.drawable.ic_thermostat),
                         contentDescription = "Weather Icon",
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(36.dp),
                     )
                     Text(
                         text = it,
                         style =
                             MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Medium,
-                                color = Color.Black,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 20.sp,
                             ),
                         modifier = Modifier.padding(start = 8.dp),
                     )
