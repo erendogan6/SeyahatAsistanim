@@ -20,4 +20,5 @@ val databaseModule =
         single { get<TravelDatabase>().travelDao() }
         single { get<TravelDatabase>().localInfoDao() }
         single { get<TravelDatabase>().checklistDao() }
+        single { get<TravelDatabase>().chatMessageDao() }
     }
