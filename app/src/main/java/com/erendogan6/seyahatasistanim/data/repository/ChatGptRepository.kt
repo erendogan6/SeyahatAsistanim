@@ -1,13 +1,16 @@
 package com.erendogan6.seyahatasistanim.data.repository
 
+import com.erendogan6.seyahatasistanim.data.local.ChatMessageDao
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatGptRequest
 import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatGptResponse
+import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatMessageEntity
 import com.erendogan6.seyahatasistanim.data.remote.ChatGptApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class ChatGptRepository(
     private val chatGptApiService: ChatGptApiService,
+    private val chatMessageDao: ChatMessageDao,
 ) {
     fun getSuggestions(request: ChatGptRequest): Flow<ChatGptResponse> =
         flow {
@@ -18,4 +21,14 @@ class ChatGptRepository(
                 throw e
             }
         }
+
+    suspend fun saveChatMessage(message: ChatMessageEntity) {
+        chatMessageDao.insertChatMessage(message)
+    }
+
+    suspend fun getAllChatMessages(): List<ChatMessageEntity> = chatMessageDao.getAllChatMessages()
+
+    suspend fun deleteAllMessages() {
+        chatMessageDao.deleteAllMessages()
+    }
 }
