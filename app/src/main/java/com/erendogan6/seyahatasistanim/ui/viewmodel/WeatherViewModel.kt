@@ -43,7 +43,8 @@ class WeatherViewModel(
             weatherRepository
                 .getWeatherForecast(lat, lon)
                 .catch { error ->
-                    _weatherData.value = null
+                    Log.e("WeatherViewModel", "Error fetching weather data from API: ${error.message}. Loading data from DB.")
+                    loadWeatherFromDb(travelDate)
                     handleWeatherError(error, "Error fetching weather data for lat: $lat, lon: $lon.")
                 }.collect { data ->
                     saveWeatherDataToDb(data)
