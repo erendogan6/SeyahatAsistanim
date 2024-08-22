@@ -1,5 +1,7 @@
 package com.erendogan6.seyahatasistanim.di
 
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.erendogan6.seyahatasistanim.BuildConfig
 import com.erendogan6.seyahatasistanim.data.remote.ChatGptApiService
 import com.erendogan6.seyahatasistanim.data.remote.CityApiService
@@ -16,16 +18,31 @@ val networkModule =
     module {
 
         single {
-            OkHttpClient
-                .Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .addInterceptor(
-                    HttpLoggingInterceptor().apply {
-                        level = HttpLoggingInterceptor.Level.BODY
-                    },
-                ).build()
+            val okHttpClientBuilder =
+                OkHttpClient
+                    .Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .addInterceptor(
+                        HttpLoggingInterceptor().apply {
+                            level = HttpLoggingInterceptor.Level.BODY
+                        },
+                    )
+
+            if (BuildConfig.DEBUG) {
+                okHttpClientBuilder.addInterceptor(
+                    ChuckerInterceptor
+                        .Builder(get())
+                        .collector(ChuckerCollector(get()))
+                        .maxContentLength(250_000L)
+                        .redactHeaders("Authorization", "Cookie")
+                        .alwaysReadResponseBody(true)
+                        .build(),
+                )
+            }
+
+            okHttpClientBuilder.build()
         }
 
         fun provideOkHttpClientWithApiKey(okHttpClient: OkHttpClient): OkHttpClient =
