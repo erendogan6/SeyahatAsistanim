@@ -1,6 +1,6 @@
 package com.erendogan6.seyahatasistanim.data.remote
 
-import com.erendogan6.seyahatasistanim.data.model.weather.WeatherApiResponse
+import com.erendogan6.seyahatasistanim.data.model.dto.weather.WeatherApiResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.util.Locale

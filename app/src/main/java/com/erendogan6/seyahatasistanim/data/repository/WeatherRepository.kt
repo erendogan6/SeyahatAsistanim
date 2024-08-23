@@ -1,9 +1,9 @@
 package com.erendogan6.seyahatasistanim.data.repository
 
-import com.erendogan6.seyahatasistanim.data.local.WeatherDao
-import com.erendogan6.seyahatasistanim.data.model.weather.City
-import com.erendogan6.seyahatasistanim.data.model.weather.WeatherApiResponse
-import com.erendogan6.seyahatasistanim.data.model.weather.WeatherEntity
+import com.erendogan6.seyahatasistanim.data.local.dao.WeatherDao
+import com.erendogan6.seyahatasistanim.data.model.dto.weather.City
+import com.erendogan6.seyahatasistanim.data.model.dto.weather.WeatherApiResponse
+import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
 import com.erendogan6.seyahatasistanim.data.remote.CityApiService
 import com.erendogan6.seyahatasistanim.data.remote.WeatherApiService
 import kotlinx.coroutines.flow.Flow

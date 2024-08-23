@@ -1,6 +1,6 @@
 package com.erendogan6.seyahatasistanim.data.repository
-import com.erendogan6.seyahatasistanim.data.local.LocalInfoDao
-import com.erendogan6.seyahatasistanim.data.model.chatGPT.LocalInfoEntity
+import com.erendogan6.seyahatasistanim.data.local.dao.LocalInfoDao
+import com.erendogan6.seyahatasistanim.data.model.entity.LocalInfoEntity
 
 class LocalInfoRepository(
     private val localInfoDao: LocalInfoDao,

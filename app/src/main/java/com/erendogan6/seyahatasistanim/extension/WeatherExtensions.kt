@@ -1,10 +1,10 @@
 package com.erendogan6.seyahatasistanim.extension
 
-import com.erendogan6.seyahatasistanim.data.model.weather.Temperature
-import com.erendogan6.seyahatasistanim.data.model.weather.Weather
-import com.erendogan6.seyahatasistanim.data.model.weather.WeatherApiResponse
-import com.erendogan6.seyahatasistanim.data.model.weather.WeatherEntity
-import com.erendogan6.seyahatasistanim.data.model.weather.WeatherForecast
+import com.erendogan6.seyahatasistanim.data.model.dto.weather.Temperature
+import com.erendogan6.seyahatasistanim.data.model.dto.weather.Weather
+import com.erendogan6.seyahatasistanim.data.model.dto.weather.WeatherApiResponse
+import com.erendogan6.seyahatasistanim.data.model.dto.weather.WeatherForecast
+import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
 import java.time.Instant
 import java.time.ZoneId
 

@@ -1,9 +1,9 @@
 package com.erendogan6.seyahatasistanim.data.repository
 
-import com.erendogan6.seyahatasistanim.data.local.ChatMessageDao
-import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatGptRequest
-import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatGptResponse
-import com.erendogan6.seyahatasistanim.data.model.chatGPT.ChatMessageEntity
+import com.erendogan6.seyahatasistanim.data.local.dao.ChatMessageDao
+import com.erendogan6.seyahatasistanim.data.model.dto.chatGPT.ChatGptRequest
+import com.erendogan6.seyahatasistanim.data.model.dto.chatGPT.ChatGptResponse
+import com.erendogan6.seyahatasistanim.data.model.entity.ChatMessageEntity
 import com.erendogan6.seyahatasistanim.data.remote.ChatGptApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
