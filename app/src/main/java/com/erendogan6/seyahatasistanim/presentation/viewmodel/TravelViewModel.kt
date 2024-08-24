@@ -25,7 +25,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class TravelViewModel(
-    private val weatherRepository: WeatherRepository,
+    private val saveTravelInfoUseCase: SaveTravelInfoUseCase,
+    private val getLastTravelInfoUseCase: GetLastTravelInfoUseCase,
+    private val getCitySuggestionsUseCase: GetCitySuggestionsUseCase,
     private val context: Context,
     private val database: TravelDatabase,
 ) : ViewModel() {
@@ -227,8 +229,7 @@ class TravelViewModel(
                     _departureCityLoadingState.value =
                         LoadingState.Loading
                     Log.d("TravelViewModel", context.getString(R.string.fetch_departure_city_suggestions, query))
-                    weatherRepository
-                        .getCitySuggestions(query)
+                    getCitySuggestionsUseCase(query)
                         .catch { error ->
                             handleTravelError(error, context.getString(R.string.error_fetching_suggestions))
                             _departureCityLoadingState.value =
@@ -253,8 +254,7 @@ class TravelViewModel(
                 LoadingState.Loading
             Log.d("TravelViewModel", context.getString(R.string.fetch_arrival_city_suggestions, query))
             viewModelScope.launch {
-                weatherRepository
-                    .getCitySuggestions(query)
+                getCitySuggestionsUseCase(query)
                     .catch { error ->
                         handleTravelError(error, context.getString(R.string.error_fetching_suggestions))
                         _arrivalCityLoadingState.value =

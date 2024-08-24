@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.dto.weather.WeatherApiResponse
 import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
-import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
+import com.erendogan6.seyahatasistanim.domain.usecase.GetWeatherDataUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.GetWeatherForecastUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.SaveWeatherDataUseCase
 import com.erendogan6.seyahatasistanim.extension.toEntityList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +19,10 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 class WeatherViewModel(
-    private val weatherRepository: WeatherRepository,
-    private val context: Context, // Injecting Context to access string resources
+    private val getWeatherForecastUseCase: GetWeatherForecastUseCase,
+    private val saveWeatherDataUseCase: SaveWeatherDataUseCase,
+    private val getWeatherDataUseCase: GetWeatherDataUseCase,
+    private val context: Context,
 ) : ViewModel() {
     private val _weatherData = MutableStateFlow<WeatherApiResponse?>(null)
     val weatherData: StateFlow<WeatherApiResponse?> = _weatherData
@@ -46,8 +50,7 @@ class WeatherViewModel(
                 "WeatherViewModel",
                 context.getString(R.string.fetching_weather_data, lat.toString(), lon.toString(), travelDate.toString()),
             )
-            weatherRepository
-                .getWeatherForecast(lat, lon)
+            getWeatherForecastUseCase(lat, lon)
                 .catch { error ->
                     Log.e(
                         "WeatherViewModel",
@@ -65,7 +68,7 @@ class WeatherViewModel(
 
     private suspend fun saveWeatherDataToDb(weatherData: WeatherApiResponse) {
         val weatherEntities = weatherData.toEntityList()
-        weatherRepository.saveWeatherData(weatherEntities)
+        saveWeatherDataUseCase(weatherEntities)
         Log.i("WeatherViewModel", context.getString(R.string.weather_data_saved_to_db))
     }
 
@@ -73,7 +76,7 @@ class WeatherViewModel(
         viewModelScope.launch {
             Log.i("WeatherViewModel", context.getString(R.string.loading_weather_data_from_db, travelDate.toString()))
             try {
-                _weatherFromDb.value = weatherRepository.getWeatherData(travelDate)
+                _weatherFromDb.value = getWeatherDataUseCase(travelDate)
                 Log.i("WeatherViewModel", context.getString(R.string.weather_data_loaded_from_db, travelDate.toString()))
             } catch (e: Exception) {
                 handleWeatherError(e, context.getString(R.string.error_loading_weather_data))

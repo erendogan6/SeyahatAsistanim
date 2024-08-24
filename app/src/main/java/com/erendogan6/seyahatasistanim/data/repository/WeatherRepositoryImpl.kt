@@ -6,16 +6,17 @@ import com.erendogan6.seyahatasistanim.data.model.dto.weather.WeatherApiResponse
 import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
 import com.erendogan6.seyahatasistanim.data.remote.CityApiService
 import com.erendogan6.seyahatasistanim.data.remote.WeatherApiService
+import com.erendogan6.seyahatasistanim.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDate
 
-class WeatherRepository(
+class WeatherRepositoryImpl(
     private val weatherApiService: WeatherApiService,
     private val cityApiService: CityApiService,
     private val weatherDao: WeatherDao,
-) {
-    fun getWeatherForecast(
+) : WeatherRepository {
+    override fun getWeatherForecast(
         lat: Double,
         lon: Double,
     ): Flow<WeatherApiResponse> =
@@ -24,16 +25,16 @@ class WeatherRepository(
             emit(response)
         }
 
-    suspend fun saveWeatherData(weatherEntities: List<WeatherEntity>) {
+    override suspend fun saveWeatherData(weatherEntities: List<WeatherEntity>) {
         weatherDao.insertWeatherData(weatherEntities)
     }
 
-    suspend fun getWeatherData(travelDate: LocalDate): List<WeatherEntity> {
+    override suspend fun getWeatherData(travelDate: LocalDate): List<WeatherEntity> {
         val startDate = travelDate.minusDays(1)
         return weatherDao.getWeatherDataForRange(startDate, travelDate)
     }
 
-    fun getCitySuggestions(query: String): Flow<List<City>> =
+    override fun getCitySuggestions(query: String): Flow<List<City>> =
         flow {
             if (query.isNotBlank()) {
                 val cities = cityApiService.getCities(query)
