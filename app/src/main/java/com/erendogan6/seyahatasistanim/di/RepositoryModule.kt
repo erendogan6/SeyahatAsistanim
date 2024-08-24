@@ -1,43 +1,48 @@
 package com.erendogan6.seyahatasistanim.di
 
-import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepository
-import com.erendogan6.seyahatasistanim.data.repository.ChecklistRepository
-import com.erendogan6.seyahatasistanim.data.repository.LocalInfoRepository
-import com.erendogan6.seyahatasistanim.data.repository.TravelRepository
-import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
+import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepositoryImpl
+import com.erendogan6.seyahatasistanim.data.repository.ChecklistRepositoryImpl
+import com.erendogan6.seyahatasistanim.data.repository.LocalInfoRepositoryImpl
+import com.erendogan6.seyahatasistanim.data.repository.TravelRepositoryImpl
+import com.erendogan6.seyahatasistanim.data.repository.WeatherRepositoryImpl
+import com.erendogan6.seyahatasistanim.domain.repository.ChatGptRepository
+import com.erendogan6.seyahatasistanim.domain.repository.ChecklistRepository
+import com.erendogan6.seyahatasistanim.domain.repository.LocalInfoRepository
+import com.erendogan6.seyahatasistanim.domain.repository.TravelRepository
+import com.erendogan6.seyahatasistanim.domain.repository.WeatherRepository
 import org.koin.dsl.module
 
 val repositoryModule =
     module {
-        single {
-            WeatherRepository(
+        single<WeatherRepository> {
+            WeatherRepositoryImpl(
                 weatherApiService = get(),
                 cityApiService = get(),
                 weatherDao = get(),
             )
         }
 
-        single {
-            ChatGptRepository(
+        single<ChatGptRepository> {
+            ChatGptRepositoryImpl(
                 chatGptApiService = get(),
                 chatMessageDao = get(),
             )
         }
 
-        single {
-            TravelRepository(
+        single<TravelRepository> {
+            TravelRepositoryImpl(
                 travelDao = get(),
             )
         }
 
-        single {
-            LocalInfoRepository(
+        single<LocalInfoRepository> {
+            LocalInfoRepositoryImpl(
                 localInfoDao = get(),
             )
         }
 
-        single {
-            ChecklistRepository(
+        single<ChecklistRepository> {
+            ChecklistRepositoryImpl(
                 checklistDao = get(),
             )
         }

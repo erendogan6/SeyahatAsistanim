@@ -8,12 +8,35 @@ import org.koin.dsl.module
 
 val viewModelModule =
     module {
-        viewModel { ChatGptViewModel(chatGptRepository = get(), localInfoRepository = get(), checklistRepository = get(), context = get()) }
-        viewModel { WeatherViewModel(weatherRepository = get(), context = get()) }
+        viewModel {
+            ChatGptViewModel(
+                context = get(),
+                getLocalInfoUseCase = get(),
+                saveLocalInfoUseCase = get(),
+                loadChecklistItemsUseCase = get(),
+                addChecklistItemUseCase = get(),
+                deleteChecklistItemUseCase = get(),
+                toggleItemCompletionUseCase = get(),
+                saveChecklistItemsUseCase = get(),
+                getAllChatMessagesUseCase = get(),
+                saveChatMessageUseCase = get(),
+                getSuggestionsUseCase = get(),
+            )
+        }
+        viewModel {
+            WeatherViewModel(
+                context = get(),
+                getWeatherDataUseCase = get(),
+                getWeatherForecastUseCase = get(),
+                saveWeatherDataUseCase = get(),
+            )
+        }
+
         viewModel {
             TravelViewModel(
-                travelRepository = get(),
-                weatherRepository = get(),
+                saveTravelInfoUseCase = get(),
+                getLastTravelInfoUseCase = get(),
+                getCitySuggestionsUseCase = get(),
                 context = get(),
                 database = get(),
             )
