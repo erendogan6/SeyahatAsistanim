@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class TravelViewModel(
-    private val travelRepository: TravelRepository,
     private val weatherRepository: WeatherRepository,
     private val context: Context,
     private val database: TravelDatabase,
@@ -80,23 +79,17 @@ class TravelViewModel(
         viewModelScope.launch {
             try {
                 Log.d("TravelViewModel", "saveTravelInfo: ${context.getString(R.string.started)}")
-
-                saveTravelInfoToDatabase(travelEntity)
+                _isTravelInfoLoading.value = true
+                saveTravelInfoUseCase(travelEntity)
+                _travelInfo.value = travelEntity
+                Log.d("TravelViewModel", context.getString(R.string.travel_info_saved_to_db))
+                _isTravelInfoLoading.value = false
                 initiateWeatherAndLocalInfoLoading(travelEntity, chatGptViewModel, weatherViewModel)
                 monitorLoadingStates(onTravelInfoSaved)
             } catch (e: Exception) {
                 handleLoadingError(e)
             }
         }
-    }
-
-    // Save travel information to the database
-    private suspend fun saveTravelInfoToDatabase(travelEntity: TravelEntity) {
-        _isTravelInfoLoading.value = true
-        travelRepository.saveTravelInfo(travelEntity)
-        _travelInfo.value = travelEntity
-        Log.d("TravelViewModel", context.getString(R.string.travel_info_saved_to_db))
-        _isTravelInfoLoading.value = false
     }
 
     // Initiate loading weather and local info data
@@ -204,10 +197,13 @@ class TravelViewModel(
     // Load the last travel information from the database
     fun loadLastTravelInfo() {
         viewModelScope.launch {
-            Log.d("TravelViewModel", context.getString(R.string.load_last_travel_info))
-            val lastTravelInfo = travelRepository.getLastTravelInfo()
-            _travelInfo.value = lastTravelInfo
-            Log.d("TravelViewModel", context.getString(R.string.last_travel_info_loaded))
+            try {
+                Log.d("TravelViewModel", context.getString(R.string.load_last_travel_info))
+                _travelInfo.value = getLastTravelInfoUseCase()
+                Log.d("TravelViewModel", context.getString(R.string.last_travel_info_loaded))
+            } catch (e: Exception) {
+                handleLoadingError(e)
+            }
         }
     }
 
