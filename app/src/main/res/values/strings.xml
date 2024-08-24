@@ -26,14 +26,14 @@
     <string name="rendering_ui_with_loading">Box: Rendering UI with isLoading = %1$s</string>
     <string name="displaying_loading_animation">Box: Displaying loading animation</string>
     <string name="displaying_travel_form">Box: Displaying travel form</string>
-    <string name="enter_travel_info">Please Enter Travel Information</string>
+    <string name="enter_travel_info">Please Enter Travel Information 😊</string>
     <string name="departure_place">Departure Place</string>
     <string name="arrival_place">Arrival Place</string>
-    <string name="bus">Bus</string>
-    <string name="plane">Plane</string>
-    <string name="train">Train</string>
-    <string name="car">Car</string>
-    <string name="continue_text">Continue</string>
+    <string name="bus">Bus 🚌</string>
+    <string name="plane">Plane ✈️</string>
+    <string name="train">Train 🚂</string>
+    <string name="car">Car 🚗</string>
+    <string name="continue_text">Continue ➡️</string>
     <string name="custom_city_field_log_tag">CustomCityField</string>
     <string name="query_suggestions">Query: %1$s, Suggestions count: %2$d cities</string>
     <string name="city_clicked">City clicked: %1$s</string>
@@ -113,7 +113,7 @@
     <string name="loading_weather_data_from_db">Loading weather data for %1$s from local database.</string>
     <string name="weather_data_loaded_from_db">Weather data for %1$s loaded from database.</string>
     <string name="error_loading_weather_data">Error loading weather data from database.</string>
-    <string name="welcome_message">🌍 Welcome to \nTravel Assistant! ✈️</string>
+    <string name="welcome_message">🌍 Travel Assistant ✈️\nThe Smartest Way to Travel! </string>
     <string name="weather_summary_format">Date: %1$s, Temperature: Day %2$.1f°C, Night %3$.1f°C, Weather: %4$s</string>
     <string name="checklist_prompt_format">
         Based on the following travel information, create a checklist of items I should bring with me:

@@ -34,10 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.dto.weather.WeatherForecast
+import com.erendogan6.seyahatasistanim.extension.capitalizeWords
 import com.erendogan6.seyahatasistanim.extension.toWeatherForecast
 import com.erendogan6.seyahatasistanim.presentation.viewmodel.TravelViewModel
 import com.erendogan6.seyahatasistanim.presentation.viewmodel.WeatherViewModel
-import com.erendogan6.seyahatasistanim.utils.capitalizeWords
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.time.LocalDate

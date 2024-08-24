@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -26,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -95,6 +98,7 @@ fun travelInfoScreen(
                                 offset = Offset(2f, 2f),
                                 blurRadius = 8f,
                             ),
+                        lineHeight = 50.sp,
                     ),
                 color = Color.Black,
                 textAlign = TextAlign.Center,
@@ -133,6 +137,7 @@ fun travelForm(
     var departureLongitude by remember { mutableStateOf<Double?>(null) }
     var arrivalLatitude by remember { mutableStateOf<Double?>(null) }
     var arrivalLongitude by remember { mutableStateOf<Double?>(null) }
+    var daysToStay by remember { mutableStateOf("") }
 
     val departureCityLoadingState by viewModel.departureCityLoadingState.collectAsState()
     val arrivalCityLoadingState by viewModel.arrivalCityLoadingState.collectAsState()
@@ -147,7 +152,8 @@ fun travelForm(
                 departureLatitude != null &&
                 departureLongitude != null &&
                 arrivalLatitude != null &&
-                arrivalLongitude != null
+                arrivalLongitude != null &&
+                daysToStay.isNotEmpty()
         }
     }
 
@@ -157,7 +163,7 @@ fun travelForm(
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(24.dp),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -237,6 +243,39 @@ fun travelForm(
                 travelMethod = it
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextField(
+                value = daysToStay,
+                onValueChange = { daysToStay = it },
+                label = { Text(stringResource(id = R.string.days_to_stay)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(
+                            56.dp,
+                        ).shadow(2.dp, RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
+                colors =
+                    TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                        errorLabelColor = Color.Transparent,
+                        cursorColor = Color.Transparent,
+                        focusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        errorTrailingIconColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent,
+                    ),
+            )
+
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
@@ -253,6 +292,7 @@ fun travelForm(
                                 departureLongitude = departureLongitude ?: 0.0,
                                 arrivalLatitude = arrivalLatitude ?: 0.0,
                                 arrivalLongitude = arrivalLongitude ?: 0.0,
+                                daysToStay = daysToStay.toInt(),
                             )
                         viewModel.saveTravelInfo(
                             travelEntity,

@@ -1,4 +1,4 @@
-package com.erendogan6.seyahatasistanim.utils
+package com.erendogan6.seyahatasistanim.extension
 
 import java.util.Locale
 

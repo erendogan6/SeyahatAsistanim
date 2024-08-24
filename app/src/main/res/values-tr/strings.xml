@@ -26,15 +26,15 @@
     <string name="rendering_ui_with_loading">Kutu: UI, isLoading ile işleniyor: %1$s</string>
     <string name="displaying_loading_animation">Kutu: Yükleme animasyonu gösteriliyor</string>
     <string name="displaying_travel_form">Kutu: Seyahat formu gösteriliyor</string>
-    <string name="enter_travel_info">Lütfen Seyahat Bilgilerini Girin</string>
+    <string name="enter_travel_info">Lütfen Seyahat Bilgilerini Girin 😊</string>
     <string name="departure_place">Kalkış Yeri</string>
     <string name="arrival_place">Varış Yeri</string>
     <string name="travel_method">Seyahat Vasıtası</string>
-    <string name="bus">Otobüs</string>
-    <string name="plane">Uçak</string>
-    <string name="train">Tren</string>
-    <string name="car">Araba</string>
-    <string name="continue_text">Devam Et</string>
+    <string name="bus">Otobüs 🚌</string>
+    <string name="plane">Uçak ✈️</string>
+    <string name="train">Tren 🚂</string>
+    <string name="car">Araba 🚗</string>
+    <string name="continue_text">Devam Et ➡️</string>
     <string name="custom_city_field_log_tag">ÖzelŞehirAlanı</string>
     <string name="query_suggestions">Sorgu: %1$s, Önerilen şehir sayısı: %2$d</string>
     <string name="city_clicked">Tıklanan şehir: %1$s</string>
@@ -113,7 +113,7 @@
     <string name="loading_weather_data_from_db">%1$s için hava durumu verileri yerel veritabanından yükleniyor.</string>
     <string name="weather_data_loaded_from_db">%1$s için hava durumu verileri veritabanından yüklendi.</string>
     <string name="error_loading_weather_data">Veritabanından hava durumu verileri yüklenirken hata oluştu.</string>
-    <string name="welcome_message">🌍 Seyahat Asistanım\'a \nHoş Geldiniz! ✈️</string>
+    <string name="welcome_message">🌍 Seyahat Asistanım ✈️\nSeyahatin En Akıllı Yolu!</string>
     <string name="weather_summary_format">Tarih: %1$s, Sıcaklık: Gündüz %2$.1f°C, Gece %3$.1f°C, Hava Durumu: %4$s</string>
     <string name="checklist_prompt_format">
         Aşağıdaki seyahat bilgileri doğrultusunda, yanımda götürmem gereken öğelerin bir kontrol listesini oluşturun:
