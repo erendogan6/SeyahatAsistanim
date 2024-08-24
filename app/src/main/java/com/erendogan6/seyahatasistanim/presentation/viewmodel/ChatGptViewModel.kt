@@ -173,10 +173,12 @@ class ChatGptViewModel(
         arrivalDate: String,
         weatherData: List<WeatherEntity>,
         travelMethod: String,
+        daysToStay: Int,
     ) {
         viewModelScope.launch {
             Log.i("ChatGptViewModel", context.getString(R.string.generating_checklist, destination))
-            val prompt = createChecklistPrompt(departureLocation, departureDate, destination, arrivalDate, weatherData, travelMethod)
+            val prompt =
+                createChecklistPrompt(departureLocation, departureDate, destination, arrivalDate, weatherData, travelMethod, daysToStay)
             val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
             _isLoading.value = true
             try {
@@ -213,6 +215,7 @@ class ChatGptViewModel(
         arrivalDate: String,
         weatherData: List<WeatherEntity>,
         travelMethod: String,
+        daysToStay: Int,
     ): String {
         val weatherSummary =
             weatherData.joinToString(separator = "\n") { weather ->
@@ -232,6 +235,7 @@ class ChatGptViewModel(
             destination,
             arrivalDate,
             travelMethod,
+            daysToStay,
             weatherSummary,
         )
     }

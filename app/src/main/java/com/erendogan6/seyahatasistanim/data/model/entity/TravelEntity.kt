@@ -15,4 +15,5 @@ data class TravelEntity(
     val departureLongitude: Double,
     val arrivalLatitude: Double,
     val arrivalLongitude: Double,
+    val daysToStay: Int,
 )

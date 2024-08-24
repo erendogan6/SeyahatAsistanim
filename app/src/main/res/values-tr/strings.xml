@@ -122,8 +122,9 @@
         - Varış Noktası: %3$s
         - Varış Tarihi: %4$s
         - Seyahat Yöntemi: %5$s
+        - Kalınacak Gün Sayısı: %6$d
         - Varıştan sonraki 7 gün için hava durumu tahmini:
-        %6$s
+        %7$s
 
         Lütfen aşağıdaki unsurlara dikkat ederek yanımda götürmem gereken öğelerin bir kontrol listesini oluşturun:
         - Seyahat yöntemi (örneğin, uçak, tren, araba vb.) ile ilgili gerekli eşyalar
@@ -132,5 +133,6 @@
 
         Yanıtınızda yalnızca kontrol listesi öğelerini listeleyin ve başka açıklama veya bilgi vermeyin.
     </string>
+    <string name="days_to_stay">Kalınacak Gün Sayısı</string>
     <string name="checklist_info">Bu kontrol listesi, seyahat bilgileriniz temel alınarak oluşturulmuş ve ChatGPT tarafından yapay zeka ile üretilmiştir. Yolculuğunuzun daha sorunsuz ve keyifli geçmesini sağlamak için özelleştirilmiş öneriler içermektedir. İyi yolculuklar!</string>
 </resources>

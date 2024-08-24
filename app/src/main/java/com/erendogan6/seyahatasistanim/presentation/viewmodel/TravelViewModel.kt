@@ -161,6 +161,7 @@ class TravelViewModel(
             arrivalDate = travelEntity.arrivalDate,
             travelMethod = travelEntity.travelMethod,
             weatherData = weatherData,
+            daysToStay = travelEntity.daysToStay,
         )
     }
 
