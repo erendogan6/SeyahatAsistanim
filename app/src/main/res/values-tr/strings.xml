@@ -132,4 +132,5 @@
 
         Yanıtınızda yalnızca kontrol listesi öğelerini listeleyin ve başka açıklama veya bilgi vermeyin.
     </string>
+    <string name="checklist_info">Bu kontrol listesi, seyahat bilgileriniz temel alınarak oluşturulmuş ve ChatGPT tarafından yapay zeka ile üretilmiştir. Yolculuğunuzun daha sorunsuz ve keyifli geçmesini sağlamak için özelleştirilmiş öneriler içermektedir. İyi yolculuklar!</string>
 </resources>

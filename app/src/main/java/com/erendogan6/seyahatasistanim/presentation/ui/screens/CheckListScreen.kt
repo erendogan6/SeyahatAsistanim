@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -64,28 +64,62 @@ fun checklistScreen(
         chatGptViewModel.loadChecklistItems()
     }
 
+    val sortedChecklistItems = checklistItems.sortedByDescending { it.isCompleted }
+
     Box(
         modifier =
             modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .background(
+                    brush =
+                        Brush.verticalGradient(
+                            colors =
+                                listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                    MaterialTheme.colorScheme.background,
+                                ),
+                        ),
+                ).padding(16.dp),
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(id = R.string.checklist_title),
                 style =
                     MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 30.sp,
+                        fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
                     ),
             )
 
-            if (checklistItems.isEmpty()) {
+            Card(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .shadow(4.dp, RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    ),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.checklist_info),
+                    style =
+                        MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        ),
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+
+            if (sortedChecklistItems.isEmpty()) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxSize(),
@@ -103,9 +137,9 @@ fun checklistScreen(
                 LazyColumn(
                     modifier = Modifier.weight(1f),
                     contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(checklistItems) { item ->
+                    items(sortedChecklistItems) { item ->
                         checklistItemCard(
                             item = item,
                             onDeleteClick = { chatGptViewModel.deleteChecklistItem(item.id) },
@@ -116,7 +150,10 @@ fun checklistScreen(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextField(
@@ -125,7 +162,7 @@ fun checklistScreen(
                     modifier =
                         Modifier
                             .weight(1f)
-                            .shadow(4.dp, RoundedCornerShape(50))
+                            .shadow(6.dp, RoundedCornerShape(50))
                             .background(
                                 MaterialTheme.colorScheme.surface,
                                 RoundedCornerShape(50),
@@ -135,20 +172,10 @@ fun checklistScreen(
                         TextFieldDefaults.colors(
                             focusedTextColor = MaterialTheme.colorScheme.onSurface,
                             unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            errorTextColor = MaterialTheme.colorScheme.error,
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
                             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                            errorContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
-                            cursorColor = MaterialTheme.colorScheme.primary,
-                            errorCursorColor = MaterialTheme.colorScheme.error,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
-                            errorIndicatorColor = MaterialTheme.colorScheme.error,
-                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         ),
                 )
                 Spacer(modifier = Modifier.width(12.dp))
@@ -161,6 +188,10 @@ fun checklistScreen(
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
+                    modifier =
+                        Modifier
+                            .shadow(10.dp, RoundedCornerShape(50))
+                            .size(56.dp),
                 ) {
                     Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add))
                 }
@@ -175,29 +206,38 @@ fun checklistItemCard(
     onDeleteClick: () -> Unit,
     onCompleteClick: () -> Unit,
 ) {
-    if (item.isCompleted) {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
     val cardElevation by animateFloatAsState(targetValue = if (item.isCompleted) 2.dp.value else 6.dp.value)
+
+    val backgroundColor =
+        if (item.isCompleted) {
+            Color(0xFFDFF8E1)
+        } else {
+            MaterialTheme.colorScheme.secondaryContainer
+        }
+
+    val textColor =
+        if (item.isCompleted) {
+            Color(0xFF4CAF50)
+        } else {
+            Color(0xFF333333)
+        }
+
+    val iconColor =
+        if (item.isCompleted) {
+            Color(0xFF4CAF50)
+        } else {
+            Color(0xFF3F51B5)
+        }
 
     Card(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .shadow(cardElevation.dp, RoundedCornerShape(16.dp))
-                .background(
-                    brush =
-                        Brush.horizontalGradient(
-                            colors =
-                                listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
-                                ),
-                        ),
-                ).animateContentSize(),
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+                .background(color = backgroundColor)
+                .animateContentSize(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
         elevation = CardDefaults.cardElevation(cardElevation.dp),
     ) {
         Row(
@@ -214,7 +254,7 @@ fun checklistItemCard(
                     MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = textColor,
                         textDecoration = if (item.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
                     ),
                 modifier = Modifier.weight(1f),
@@ -223,7 +263,7 @@ fun checklistItemCard(
                 Icon(
                     Icons.Default.Done,
                     contentDescription = stringResource(id = R.string.complete),
-                    tint = if (item.isCompleted) Color.Gray else MaterialTheme.colorScheme.secondary,
+                    tint = iconColor,
                 )
             }
             IconButton(onClick = onDeleteClick) {
