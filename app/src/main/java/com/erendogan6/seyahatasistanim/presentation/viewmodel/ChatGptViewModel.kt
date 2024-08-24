@@ -12,9 +12,13 @@ import com.erendogan6.seyahatasistanim.data.model.entity.ChecklistItemEntity
 import com.erendogan6.seyahatasistanim.data.model.entity.LocalInfoEntity
 import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
 import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepository
-import com.erendogan6.seyahatasistanim.data.repository.ChecklistRepository
+import com.erendogan6.seyahatasistanim.domain.usecase.AddChecklistItemUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.DeleteChecklistItemUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.GetLocalInfoUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.LoadChecklistItemsUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.SaveChecklistItemsUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.SaveLocalInfoUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.ToggleItemCompletionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -227,7 +231,7 @@ class ChatGptViewModel(
 
     private suspend fun saveChecklistToDatabase(items: List<String>) {
         val checklistItems = items.map { ChecklistItemEntity(item = it) }
-        checklistRepository.saveChecklistItems(checklistItems)
+        saveChecklistItemsUseCase(checklistItems)
         Log.i("ChatGptViewModel", context.getString(R.string.checklist_items_saved_to_db))
     }
 
@@ -240,7 +244,7 @@ class ChatGptViewModel(
         viewModelScope.launch {
             try {
                 Log.i("ChatGptViewModel", context.getString(R.string.loading_checklist_items))
-                val checklistItemsFromDb = checklistRepository.getAllChecklistItems()
+                val checklistItemsFromDb = loadChecklistItemsUseCase()
                 _checklistItems.value = checklistItemsFromDb.map { it }
                 Log.i("ChatGptViewModel", context.getString(R.string.checklist_items_loaded_from_db))
             } catch (e: Exception) {
@@ -255,8 +259,7 @@ class ChatGptViewModel(
         viewModelScope.launch {
             Log.i("ChatGptViewModel", context.getString(R.string.adding_new_checklist_item, item))
             try {
-                val newItem = ChecklistItemEntity(item = item)
-                checklistRepository.saveChecklistItems(listOf(newItem))
+                addChecklistItemUseCase(item)
                 loadChecklistItems()
                 Log.i("ChatGptViewModel", context.getString(R.string.new_checklist_item_added))
             } catch (e: Exception) {
@@ -271,7 +274,7 @@ class ChatGptViewModel(
         viewModelScope.launch {
             Log.i("ChatGptViewModel", context.getString(R.string.deleting_checklist_item, id))
             try {
-                checklistRepository.deleteChecklistItem(id)
+                deleteChecklistItemUseCase(id)
                 loadChecklistItems()
                 Log.i("ChatGptViewModel", context.getString(R.string.checklist_item_deleted))
             } catch (e: Exception) {
@@ -286,7 +289,7 @@ class ChatGptViewModel(
         viewModelScope.launch {
             Log.i("ChatGptViewModel", context.getString(R.string.toggling_completion_status, id))
             try {
-                checklistRepository.toggleChecklistItemCompletion(id)
+                toggleItemCompletionUseCase(id)
                 loadChecklistItems()
                 Log.i("ChatGptViewModel", context.getString(R.string.completion_status_toggled))
             } catch (e: Exception) {
