@@ -11,11 +11,13 @@ import com.erendogan6.seyahatasistanim.data.model.entity.ChatMessageEntity
 import com.erendogan6.seyahatasistanim.data.model.entity.ChecklistItemEntity
 import com.erendogan6.seyahatasistanim.data.model.entity.LocalInfoEntity
 import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
-import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepository
 import com.erendogan6.seyahatasistanim.domain.usecase.AddChecklistItemUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.DeleteChecklistItemUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.GetAllChatMessagesUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.GetLocalInfoUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.GetSuggestionsUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.LoadChecklistItemsUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.SaveChatMessageUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.SaveChecklistItemsUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.SaveLocalInfoUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.ToggleItemCompletionUseCase
@@ -24,11 +26,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ChatGptViewModel(
-    private val chatGptRepository: ChatGptRepository,
-    private val localInfoRepository: LocalInfoRepository,
-    private val checklistRepository: ChecklistRepository,
     private val getLocalInfoUseCase: GetLocalInfoUseCase,
     private val saveLocalInfoUseCase: SaveLocalInfoUseCase,
+    private val loadChecklistItemsUseCase: LoadChecklistItemsUseCase,
+    private val addChecklistItemUseCase: AddChecklistItemUseCase,
+    private val deleteChecklistItemUseCase: DeleteChecklistItemUseCase,
+    private val toggleItemCompletionUseCase: ToggleItemCompletionUseCase,
+    private val saveChecklistItemsUseCase: SaveChecklistItemsUseCase,
+    private val getSuggestionsUseCase: GetSuggestionsUseCase,
+    private val saveChatMessageUseCase: SaveChatMessageUseCase,
+    private val getAllChatMessagesUseCase: GetAllChatMessagesUseCase,
     private val context: Context,
 ) : ViewModel() {
     private val _localInfo = MutableStateFlow<LocalInfoEntity?>(null)
@@ -53,7 +60,7 @@ class ChatGptViewModel(
     private fun loadConversation() {
         viewModelScope.launch {
             try {
-                val messages = chatGptRepository.getAllChatMessages()
+                val messages = getAllChatMessagesUseCase()
                 _conversation.value = messages
             } catch (e: Exception) {
                 _error.value = context.getString(R.string.failed_to_load_conversation, e.message ?: "")
@@ -73,13 +80,13 @@ class ChatGptViewModel(
                 _isLoading.value = true
 
                 val userMessageEntity = ChatMessageEntity(content = userMessage, role = "user")
-                chatGptRepository.saveChatMessage(userMessageEntity)
+                saveChatMessageUseCase(userMessageEntity)
                 _conversation.value += userMessageEntity
 
                 val prompt = createPrompt(userMessage, departureLocation, departureDate, arrivalLocation, arrivalDate)
                 val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
 
-                chatGptRepository.getSuggestions(request).collect { response ->
+                getSuggestionsUseCase(request).collect { response ->
                     val assistantMessage =
                         response.choices
                             .firstOrNull()
@@ -88,7 +95,7 @@ class ChatGptViewModel(
                             .orEmpty()
                     val assistantMessageEntity = ChatMessageEntity(content = assistantMessage, role = "assistant")
 
-                    chatGptRepository.saveChatMessage(assistantMessageEntity)
+                    saveChatMessageUseCase(assistantMessageEntity)
                     _conversation.value += assistantMessageEntity
                 }
             } catch (e: Exception) {
@@ -132,7 +139,7 @@ class ChatGptViewModel(
                     Log.i("ChatGptViewModel", context.getString(R.string.no_local_info_found))
                     val prompt = createLocalInfoPrompt(destination)
                     val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
-                    chatGptRepository.getSuggestions(request).collect { response ->
+                    getSuggestionsUseCase(request).collect { response ->
                         val localInfoContent =
                             response.choices
                                 .firstOrNull()
@@ -173,7 +180,7 @@ class ChatGptViewModel(
             val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
             _isLoading.value = true
             try {
-                chatGptRepository.getSuggestions(request).collect { response ->
+                getSuggestionsUseCase(request).collect { response ->
                     val checklistItems =
                         response.choices
                             .firstOrNull()

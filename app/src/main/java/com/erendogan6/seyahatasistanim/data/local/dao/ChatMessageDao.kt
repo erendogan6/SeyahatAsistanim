@@ -12,7 +12,4 @@ interface ChatMessageDao {
 
     @Query("SELECT * FROM chat_messages ORDER BY id ASC")
     suspend fun getAllChatMessages(): List<ChatMessageEntity>
-
-    @Query("DELETE FROM chat_messages")
-    suspend fun deleteAllMessages()
 }
