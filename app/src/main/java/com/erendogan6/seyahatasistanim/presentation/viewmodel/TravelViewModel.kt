@@ -9,8 +9,9 @@ import com.erendogan6.seyahatasistanim.data.local.database.TravelDatabase
 import com.erendogan6.seyahatasistanim.data.model.dto.weather.City
 import com.erendogan6.seyahatasistanim.data.model.entity.TravelEntity
 import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
-import com.erendogan6.seyahatasistanim.data.repository.TravelRepository
-import com.erendogan6.seyahatasistanim.data.repository.WeatherRepository
+import com.erendogan6.seyahatasistanim.domain.usecase.GetCitySuggestionsUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.GetLastTravelInfoUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.SaveTravelInfoUseCase
 import com.erendogan6.seyahatasistanim.extension.toEntityList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
