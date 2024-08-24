@@ -1,13 +1,14 @@
 package com.erendogan6.seyahatasistanim.data.repository
 import com.erendogan6.seyahatasistanim.data.local.dao.LocalInfoDao
 import com.erendogan6.seyahatasistanim.data.model.entity.LocalInfoEntity
+import com.erendogan6.seyahatasistanim.domain.repository.LocalInfoRepository
 
-class LocalInfoRepository(
+class LocalInfoRepositoryImpl(
     private val localInfoDao: LocalInfoDao,
-) {
-    suspend fun saveLocalInfo(localInfo: LocalInfoEntity) {
+) : LocalInfoRepository {
+    override suspend fun saveLocalInfo(localInfo: LocalInfoEntity) {
         localInfoDao.saveLocalInfo(localInfo)
     }
 
-    suspend fun getLocalInfo(destination: String): LocalInfoEntity? = localInfoDao.getLocalInfo(destination)
+    override suspend fun getLocalInfo(): LocalInfoEntity? = localInfoDao.getLocalInfo()
 }

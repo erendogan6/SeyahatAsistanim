@@ -13,7 +13,8 @@ import com.erendogan6.seyahatasistanim.data.model.entity.LocalInfoEntity
 import com.erendogan6.seyahatasistanim.data.model.entity.WeatherEntity
 import com.erendogan6.seyahatasistanim.data.repository.ChatGptRepository
 import com.erendogan6.seyahatasistanim.data.repository.ChecklistRepository
-import com.erendogan6.seyahatasistanim.data.repository.LocalInfoRepository
+import com.erendogan6.seyahatasistanim.domain.usecase.GetLocalInfoUseCase
+import com.erendogan6.seyahatasistanim.domain.usecase.SaveLocalInfoUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,6 +23,8 @@ class ChatGptViewModel(
     private val chatGptRepository: ChatGptRepository,
     private val localInfoRepository: LocalInfoRepository,
     private val checklistRepository: ChecklistRepository,
+    private val getLocalInfoUseCase: GetLocalInfoUseCase,
+    private val saveLocalInfoUseCase: SaveLocalInfoUseCase,
     private val context: Context,
 ) : ViewModel() {
     private val _localInfo = MutableStateFlow<LocalInfoEntity?>(null)
@@ -114,15 +117,15 @@ class ChatGptViewModel(
 
     fun getLocalInfoForDestination(destination: String) {
         viewModelScope.launch {
-            Log.i("ChatGptViewModel", context.getString(R.string.fetching_local_info, destination))
+            Log.i("ChatGptViewModel", context.getString(R.string.fetching_local_info))
             _isLoading.value = true
             try {
-                val localInfoFromDb = localInfoRepository.getLocalInfo(destination)
+                val localInfoFromDb = getLocalInfoUseCase()
                 if (localInfoFromDb != null) {
-                    Log.i("ChatGptViewModel", context.getString(R.string.local_info_found_in_db, destination))
+                    Log.i("ChatGptViewModel", context.getString(R.string.local_info_found_in_db))
                     _localInfo.value = localInfoFromDb
                 } else {
-                    Log.i("ChatGptViewModel", context.getString(R.string.no_local_info_found, destination))
+                    Log.i("ChatGptViewModel", context.getString(R.string.no_local_info_found))
                     val prompt = createLocalInfoPrompt(destination)
                     val request = ChatGptRequest(messages = listOf(Message(role = "user", content = prompt)))
                     chatGptRepository.getSuggestions(request).collect { response ->
@@ -229,7 +232,7 @@ class ChatGptViewModel(
     }
 
     private suspend fun saveLocalInfoToDatabase(localInfo: LocalInfoEntity) {
-        localInfoRepository.saveLocalInfo(localInfo)
+        saveLocalInfoUseCase(localInfo)
         Log.i("ChatGptViewModel", context.getString(R.string.local_info_saved_to_db))
     }
 

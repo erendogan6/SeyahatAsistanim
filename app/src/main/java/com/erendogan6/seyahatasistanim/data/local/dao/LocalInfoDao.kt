@@ -11,6 +11,6 @@ interface LocalInfoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveLocalInfo(localInfo: LocalInfoEntity)
 
-    @Query("SELECT * FROM local_info WHERE destination = :destination LIMIT 1")
-    suspend fun getLocalInfo(destination: String): LocalInfoEntity?
+    @Query("SELECT * FROM local_info")
+    suspend fun getLocalInfo(): LocalInfoEntity?
 }
