@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.presentation.viewmodel.TravelViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -54,12 +53,9 @@ fun homeScreen(
 
         Text(
             text = stringResource(id = R.string.app_name),
-            style =
-                MaterialTheme.typography.headlineMedium.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 28.sp,
-                ),
+            style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(bottom = 32.dp),
+            color = MaterialTheme.colorScheme.primary,
         )
 
         buttonWithIcon(
@@ -111,7 +107,7 @@ fun homeScreen(
             shape = MaterialTheme.shapes.medium,
             elevation = ButtonDefaults.buttonElevation(8.dp),
         ) {
-            Text(text = stringResource(id = R.string.new_travel))
+            Text(text = stringResource(id = R.string.new_travel), style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -138,6 +134,6 @@ fun buttonWithIcon(
                 modifier = Modifier.padding(end = 8.dp),
             )
         }
-        Text(text = text)
+        Text(text = text, style = MaterialTheme.typography.titleMedium)
     }
 }
