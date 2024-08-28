@@ -11,6 +11,4 @@ data class WeatherEntity(
     val temperatureDay: Double,
     val temperatureNight: Double,
     val description: String,
-    val latitude: Double,
-    val longitude: Double,
 )
