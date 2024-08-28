@@ -33,6 +33,7 @@ Seyahat Asistanım, OpenAI’nin ChatGPT-4O modelini kullanmaktadır.
 - **LeakCanary** (Memory Leak Detection)
 - **ChatGPT API**
 - **Coroutines** (Asynchronous Programming)
+- **ProGuard** (Code Obsufcation)
 - **Lottie** (Animations)
 - **Koin** (Dependency Injection)
 - **OpenWeather API**
