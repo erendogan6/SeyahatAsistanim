@@ -14,7 +14,10 @@ interface WeatherRepository {
 
     suspend fun saveWeatherData(weatherEntities: List<WeatherEntity>)
 
-    suspend fun getWeatherData(travelDate: LocalDate): List<WeatherEntity>
+    suspend fun getWeatherData(
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): List<WeatherEntity>
 
     fun getCitySuggestions(query: String): Flow<List<City>>
 }

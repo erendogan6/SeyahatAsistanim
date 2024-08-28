@@ -7,5 +7,8 @@ import java.time.LocalDate
 class GetWeatherDataUseCase(
     private val weatherRepository: WeatherRepository,
 ) {
-    suspend operator fun invoke(travelDate: LocalDate): List<WeatherEntity> = weatherRepository.getWeatherData(travelDate)
+    suspend operator fun invoke(
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): List<WeatherEntity> = weatherRepository.getWeatherData(startDate, endDate)
 }

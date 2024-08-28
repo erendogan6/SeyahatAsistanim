@@ -29,10 +29,10 @@ class WeatherRepositoryImpl(
         weatherDao.insertWeatherData(weatherEntities)
     }
 
-    override suspend fun getWeatherData(travelDate: LocalDate): List<WeatherEntity> {
-        val startDate = travelDate.minusDays(1)
-        return weatherDao.getWeatherDataForRange(startDate, travelDate)
-    }
+    override suspend fun getWeatherData(
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): List<WeatherEntity> = weatherDao.getWeatherDataForRange(startDate, endDate)
 
     override fun getCitySuggestions(query: String): Flow<List<City>> =
         flow {

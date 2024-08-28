@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -112,11 +113,7 @@ class TravelViewModel(
         _isLocalInfoLoading.value = true
 
         chatGptViewModel.getLocalInfoForDestination(destination)
-        weatherViewModel.getWeatherForecast(
-            travelEntity.arrivalLatitude,
-            travelEntity.arrivalLongitude,
-            arrivalDate,
-        )
+        weatherViewModel.fetchWeatherData(travelEntity.arrivalLatitude, travelEntity.arrivalLongitude, arrivalDate, travelEntity.daysToStay)
 
         viewModelScope.launch {
             weatherViewModel.weatherData.collect { weatherData ->

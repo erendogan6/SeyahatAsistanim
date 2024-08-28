@@ -65,6 +65,7 @@ fun weatherDetailScreen(
 
     val lat = travelInfo?.arrivalLatitude ?: 0.0
     val lon = travelInfo?.arrivalLongitude ?: 0.0
+    val daysToStay = travelInfo?.daysToStay ?: 1
     val arrivalLocation = travelInfo?.arrivalPlace ?: stringResource(id = R.string.unknown_location)
 
     val weatherData by viewModel.weatherData.collectAsState()
@@ -72,13 +73,9 @@ fun weatherDetailScreen(
 
     LaunchedEffect(travelInfo) {
         if (travelInfo != null) {
-            viewModel.loadWeatherFromDb(parsedDate)
-            weatherFromDb?.let {
-                if (it.isEmpty()) {
-                    viewModel.getWeatherForecast(lat, lon, parsedDate)
-                }
-            } ?: run {
-                viewModel.getWeatherForecast(lat, lon, parsedDate)
+            viewModel.fetchWeatherData(lat, lon, parsedDate, daysToStay)
+            if (weatherData == null) {
+                viewModel.loadWeatherFromDb(parsedDate, daysToStay)
             }
         }
     }
