@@ -69,7 +69,6 @@ dependencies {
 
     // Room Database
     implementation libs.androidx.room.runtime
-    implementation libs.androidx.navigation.compose
     annotationProcessor(libs.androidx.room.compiler)
     kapt (libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -98,6 +97,10 @@ dependencies {
 
     // Markdown Compose
     implementation libs.compose.markdown
+
+    //Navigation
+    implementation libs.androidx.navigation.compose
+
 
     implementation libs.androidx.navigation.runtime.ktx
     implementation libs.androidx.lifecycle.viewmodel.compose
