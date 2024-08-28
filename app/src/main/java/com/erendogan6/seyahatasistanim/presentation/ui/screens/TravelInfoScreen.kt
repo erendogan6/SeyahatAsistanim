@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,6 +61,7 @@ import com.erendogan6.seyahatasistanim.presentation.viewmodel.ChatGptViewModel
 import com.erendogan6.seyahatasistanim.presentation.viewmodel.TravelViewModel
 import com.erendogan6.seyahatasistanim.presentation.viewmodel.WeatherViewModel
 import com.erendogan6.seyahatasistanim.utils.DateUtils
+import com.erendogan6.seyahatasistanim.utils.validateDates
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -145,6 +147,10 @@ fun travelForm(
     var arrivalLongitude by remember { mutableStateOf<Double?>(null) }
     var daysToStay by remember { mutableStateOf("") }
 
+    var dateError by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+
     val departureCityLoadingState by viewModel.departureCityLoadingState.collectAsState()
     val arrivalCityLoadingState by viewModel.arrivalCityLoadingState.collectAsState()
 
@@ -159,7 +165,8 @@ fun travelForm(
                 departureLongitude != null &&
                 arrivalLatitude != null &&
                 arrivalLongitude != null &&
-                daysToStay.isNotEmpty()
+                daysToStay.isNotEmpty() &&
+                dateError == null
         }
     }
 
@@ -190,7 +197,12 @@ fun travelForm(
 
                 datePickerField(
                     value = departureDate,
-                    onValueChange = { departureDate = it },
+                    onValueChange = {
+                        departureDate = it
+                        validateDates(context, departureDate, arrivalDate) { error ->
+                            dateError = error
+                        }
+                    },
                     label = stringResource(id = R.string.departure_date),
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -222,7 +234,12 @@ fun travelForm(
 
                 datePickerField(
                     value = arrivalDate,
-                    onValueChange = { arrivalDate = it },
+                    onValueChange = {
+                        arrivalDate = it
+                        validateDates(context, departureDate, arrivalDate) { error ->
+                            dateError = error
+                        }
+                    },
                     label = stringResource(id = R.string.arrival_date),
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -249,6 +266,15 @@ fun travelForm(
                     },
                     loadingState = arrivalCityLoadingState,
                 )
+
+                if (dateError != null) {
+                    Text(
+                        text = dateError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(8.dp),
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 

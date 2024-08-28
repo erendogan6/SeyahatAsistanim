@@ -135,4 +135,6 @@
     </string>
     <string name="days_to_stay">Kalınacak Gün Sayısı</string>
     <string name="checklist_info">Bu kontrol listesi, seyahat bilgileriniz temel alınarak oluşturulmuş ve ChatGPT tarafından yapay zeka ile üretilmiştir. Yolculuğunuzun daha sorunsuz ve keyifli geçmesini sağlamak için özelleştirilmiş öneriler içermektedir. İyi yolculuklar!</string>
+    <string name="error_arrival_date_earlier">Varış tarihi, kalkış tarihinden önce olamaz.</string>
+    <string name="error_departure_date_later">Kalkış tarihi, varış tarihinden sonra olamaz.</string>
 </resources>
