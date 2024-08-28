@@ -13,6 +13,7 @@ import com.erendogan6.seyahatasistanim.domain.usecase.GetCitySuggestionsUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.GetLastTravelInfoUseCase
 import com.erendogan6.seyahatasistanim.domain.usecase.SaveTravelInfoUseCase
 import com.erendogan6.seyahatasistanim.extension.toEntityList
+import com.erendogan6.seyahatasistanim.utils.isNetworkAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -82,6 +83,11 @@ class TravelViewModel(
     ) {
         viewModelScope.launch {
             try {
+                if (!isNetworkAvailable(context)) {
+                    _errorState.value = context.getString(R.string.no_internet_connection)
+                    return@launch
+                }
+
                 Log.d("TravelViewModel", "saveTravelInfo: ${context.getString(R.string.started)}")
                 _isTravelInfoLoading.value = true
                 saveTravelInfoUseCase(travelEntity)
@@ -174,7 +180,7 @@ class TravelViewModel(
                 travelLoading || weatherLoading || localInfoLoading || checklistLoading
             }.collect { combinedLoading ->
                 _isLoading.value = combinedLoading
-                Log.d("TravelViewModel", context.getString(R.string.combined_loading_state, combinedLoading))
+                Log.d("TravelViewModel", context.getString(R.string.combined_loading_state))
                 if (!combinedLoading) {
                     onTravelInfoSaved()
                     Log.d("TravelViewModel", context.getString(R.string.all_processes_completed))
