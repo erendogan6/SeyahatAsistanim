@@ -17,7 +17,7 @@ import com.erendogan6.seyahatasistanim.R
 
 @Composable
 fun lottieLoadingScreen(modifier: Modifier = Modifier) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation))
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever,
