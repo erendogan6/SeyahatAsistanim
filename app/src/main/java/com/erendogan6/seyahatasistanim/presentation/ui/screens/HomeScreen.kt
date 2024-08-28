@@ -92,8 +92,9 @@ fun homeScreen(
 
         Button(
             onClick = {
-                travelViewModel.deleteTravelInfo()
-                onNavigateToTravelInfo()
+                travelViewModel.deleteTravelInfo {
+                    onNavigateToTravelInfo()
+                }
             },
             modifier =
                 Modifier

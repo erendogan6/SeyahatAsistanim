@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -68,12 +70,18 @@ fun travelInfoScreen(
     weatherViewModel: WeatherViewModel = koinViewModel(),
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
-
-    val logTag = stringResource(id = R.string.travel_info_screen_log_tag)
-    val loadingStateChangedMessage = stringResource(id = R.string.loading_state_changed, isLoading)
+    var shouldNavigate by remember { mutableStateOf(false) }
 
     LaunchedEffect(isLoading) {
-        Log.d(logTag, loadingStateChangedMessage)
+        if (!isLoading && shouldNavigate) {
+            navController.navigate("home") {
+                popUpTo("travelInfo") { inclusive = true }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        shouldNavigate = true
     }
 
     Box(
@@ -98,13 +106,11 @@ fun travelInfoScreen(
                                 offset = Offset(2f, 2f),
                                 blurRadius = 8f,
                             ),
-                        lineHeight = 50.sp,
+                        lineHeight = 40.sp,
                     ),
                 color = Color.Black,
                 textAlign = TextAlign.Center,
-                modifier =
-                    Modifier
-                        .padding(start = 8.dp, end = 8.dp, top = 20.dp),
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 20.dp),
             )
 
             if (isLoading) {
@@ -157,169 +163,179 @@ fun travelForm(
         }
     }
 
+    val scrollState = rememberScrollState()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(id = R.string.enter_travel_info),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center,
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            datePickerField(
-                value = departureDate,
-                onValueChange = { departureDate = it },
-                label = stringResource(id = R.string.departure_date),
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            customCityField(
-                value = departurePlace,
-                onValueChange = {
-                    departurePlace = it
-                    viewModel.fetchDepartureCitySuggestions(it)
-                },
-                label = stringResource(id = R.string.departure_place),
-                citySuggestions = (departureCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
-                onCitySelected = { city ->
-                    departurePlace =
-                        if (city.localNames?.tr != null) {
-                            city.localNames.tr + " - " + city.country
-                        } else {
-                            city.name + " - " + city.country
-                        }
-                    departureLatitude = city.latitude
-                    departureLongitude = city.longitude
-                },
-                loadingState = departureCityLoadingState,
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            datePickerField(
-                value = arrivalDate,
-                onValueChange = { arrivalDate = it },
-                label = stringResource(id = R.string.arrival_date),
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            customCityField(
-                value = arrivalPlace,
-                onValueChange = {
-                    arrivalPlace = it
-                    viewModel.fetchArrivalCitySuggestions(it)
-                },
-                label = stringResource(id = R.string.arrival_place),
-                citySuggestions = (arrivalCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
-                onCitySelected = { city ->
-                    arrivalPlace =
-                        if (city.localNames?.tr != null) {
-                            city.localNames.tr + " - " + city.country
-                        } else {
-                            city.name + " - " + city.country
-                        }
-                    arrivalLatitude = city.latitude
-                    arrivalLongitude = city.longitude
-                },
-                loadingState = arrivalCityLoadingState,
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            travelMethodDropdown(travelMethod) {
-                travelMethod = it
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextField(
-                value = daysToStay,
-                onValueChange = { daysToStay = it },
-                label = { Text(stringResource(id = R.string.days_to_stay)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .height(
-                            56.dp,
-                        ).shadow(2.dp, RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
-                colors =
-                    TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = Color.Transparent,
-                        errorLabelColor = Color.Transparent,
-                        cursorColor = Color.Transparent,
-                        focusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        errorTrailingIconColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                    ),
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
-                    if (isFormValid) {
-                        val travelEntity =
-                            TravelEntity(
-                                departureDate = departureDate,
-                                arrivalDate = arrivalDate,
-                                departurePlace = departurePlace,
-                                arrivalPlace = arrivalPlace,
-                                travelMethod = travelMethod,
-                                departureLatitude = departureLatitude ?: 0.0,
-                                departureLongitude = departureLongitude ?: 0.0,
-                                arrivalLatitude = arrivalLatitude ?: 0.0,
-                                arrivalLongitude = arrivalLongitude ?: 0.0,
-                                daysToStay = daysToStay.toInt(),
-                            )
-                        viewModel.saveTravelInfo(
-                            travelEntity,
-                            chatGptViewModel,
-                            weatherViewModel,
-                        ) {
-                            navController.navigate("home")
-                        }
-                    }
-                },
-                enabled = isFormValid,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(55.dp)
-                        .shadow(4.dp, RoundedCornerShape(30.dp)),
-                shape = RoundedCornerShape(30.dp),
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White,
-                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        disabledContentColor = Color.White.copy(alpha = 0.5f),
-                    ),
+                        .fillMaxSize()
+                        .padding(20.dp)
+                        .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = stringResource(id = R.string.continue_text), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = stringResource(id = R.string.enter_travel_info),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                datePickerField(
+                    value = departureDate,
+                    onValueChange = { departureDate = it },
+                    label = stringResource(id = R.string.departure_date),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                customCityField(
+                    value = departurePlace,
+                    onValueChange = {
+                        departurePlace = it
+                        viewModel.fetchDepartureCitySuggestions(it)
+                    },
+                    label = stringResource(id = R.string.departure_place),
+                    citySuggestions = (departureCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
+                    onCitySelected = { city ->
+                        departurePlace =
+                            if (city.localNames?.tr != null) {
+                                city.localNames.tr + " - " + city.country
+                            } else {
+                                city.name + " - " + city.country
+                            }
+                        departureLatitude = city.latitude
+                        departureLongitude = city.longitude
+                    },
+                    loadingState = departureCityLoadingState,
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                datePickerField(
+                    value = arrivalDate,
+                    onValueChange = { arrivalDate = it },
+                    label = stringResource(id = R.string.arrival_date),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                customCityField(
+                    value = arrivalPlace,
+                    onValueChange = {
+                        arrivalPlace = it
+                        viewModel.fetchArrivalCitySuggestions(it)
+                    },
+                    label = stringResource(id = R.string.arrival_place),
+                    citySuggestions = (arrivalCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
+                    onCitySelected = { city ->
+                        arrivalPlace =
+                            if (city.localNames?.tr != null) {
+                                city.localNames.tr + " - " + city.country
+                            } else {
+                                city.name + " - " + city.country
+                            }
+                        arrivalLatitude = city.latitude
+                        arrivalLongitude = city.longitude
+                    },
+                    loadingState = arrivalCityLoadingState,
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                travelMethodDropdown(travelMethod) {
+                    travelMethod = it
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = daysToStay,
+                    onValueChange = { daysToStay = it },
+                    label = { Text(stringResource(id = R.string.days_to_stay)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(
+                                56.dp,
+                            ).shadow(2.dp, RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
+                    colors =
+                        TextFieldDefaults.colors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = Color.Transparent,
+                            errorLabelColor = Color.Transparent,
+                            cursorColor = Color.Transparent,
+                            focusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            errorTrailingIconColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent,
+                        ),
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    onClick = {
+                        if (isFormValid) {
+                            val travelEntity =
+                                TravelEntity(
+                                    departureDate = departureDate,
+                                    arrivalDate = arrivalDate,
+                                    departurePlace = departurePlace,
+                                    arrivalPlace = arrivalPlace,
+                                    travelMethod = travelMethod,
+                                    departureLatitude = departureLatitude ?: 0.0,
+                                    departureLongitude = departureLongitude ?: 0.0,
+                                    arrivalLatitude = arrivalLatitude ?: 0.0,
+                                    arrivalLongitude = arrivalLongitude ?: 0.0,
+                                    daysToStay = daysToStay.toInt(),
+                                )
+                            viewModel.saveTravelInfo(
+                                travelEntity,
+                                chatGptViewModel,
+                                weatherViewModel,
+                            ) {
+                                navController.navigate("home")
+                            }
+                        }
+                    },
+                    enabled = isFormValid,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(55.dp)
+                            .shadow(4.dp, RoundedCornerShape(30.dp)),
+                    shape = RoundedCornerShape(30.dp),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = Color.White,
+                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            disabledContentColor = Color.White.copy(alpha = 0.5f),
+                        ),
+                ) {
+                    Text(text = stringResource(id = R.string.continue_text), style = MaterialTheme.typography.bodyLarge)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

@@ -209,12 +209,16 @@ class TravelViewModel(
     }
 
     // Delete all travel information from the database
-    fun deleteTravelInfo() {
+    fun deleteTravelInfo(onComplete: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("TravelViewModel", context.getString(R.string.delete_travel_info))
             database.clearAllTables()
-            _travelInfo.value = null
-            Log.d("TravelViewModel", context.getString(R.string.travel_info_deleted))
+
+            withContext(Dispatchers.Main) {
+                _travelInfo.value = null
+                Log.d("TravelViewModel", context.getString(R.string.travel_info_deleted))
+                onComplete()
+            }
         }
     }
 
