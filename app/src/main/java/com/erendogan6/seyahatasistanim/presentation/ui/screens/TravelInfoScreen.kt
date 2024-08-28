@@ -1,6 +1,7 @@
 package com.erendogan6.seyahatasistanim.presentation.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -71,8 +72,16 @@ fun travelInfoScreen(
     chatGptViewModel: ChatGptViewModel = koinViewModel(),
     weatherViewModel: WeatherViewModel = koinViewModel(),
 ) {
+    val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorState by viewModel.errorState.collectAsState()
     var shouldNavigate by remember { mutableStateOf(false) }
+
+    LaunchedEffect(errorState) {
+        errorState?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
 
     LaunchedEffect(isLoading) {
         if (!isLoading && shouldNavigate) {
