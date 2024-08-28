@@ -53,8 +53,17 @@ class ChatGptViewModel(
     private val _conversation = MutableStateFlow<List<ChatMessageEntity>>(emptyList())
     val conversation: StateFlow<List<ChatMessageEntity>> = _conversation
 
+    private var _notificationShown = false
+
+    val notificationShown: Boolean
+        get() = _notificationShown
+
     init {
         loadConversation()
+    }
+
+    fun setNotificationShown() {
+        _notificationShown = true
     }
 
     private fun loadConversation() {

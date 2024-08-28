@@ -27,6 +27,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -36,6 +38,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import com.erendogan6.seyahatasistanim.R
 import com.erendogan6.seyahatasistanim.data.model.entity.ChecklistItemEntity
 import com.erendogan6.seyahatasistanim.presentation.viewmodel.ChatGptViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -58,6 +62,8 @@ fun checklistScreen(
     chatGptViewModel: ChatGptViewModel = koinViewModel(),
 ) {
     val checklistItems by chatGptViewModel.checklistItems.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     var newItem by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
@@ -97,15 +103,11 @@ fun checklistScreen(
             )
 
             Card(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                        .shadow(4.dp, RoundedCornerShape(16.dp)),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
                 colors =
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        containerColor = Color.Gray.copy(alpha = 0.1f),
                     ),
             ) {
                 Text(
@@ -115,7 +117,7 @@ fun checklistScreen(
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                         ),
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(10.dp),
                 )
             }
 
@@ -143,7 +145,17 @@ fun checklistScreen(
                         checklistItemCard(
                             item = item,
                             onDeleteClick = { chatGptViewModel.deleteChecklistItem(item.id) },
-                            onCompleteClick = { chatGptViewModel.toggleItemCompletion(item.id) },
+                            onCompleteClick = {
+                                val wasCompleted = item.isCompleted
+                                chatGptViewModel.toggleItemCompletion(item.id)
+
+                                if (!wasCompleted && !chatGptViewModel.notificationShown) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Congratulations on completing a task!")
+                                        chatGptViewModel.setNotificationShown()
+                                    }
+                                }
+                            },
                         )
                     }
                 }
@@ -197,6 +209,11 @@ fun checklistScreen(
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(60.dp)),
+        )
     }
 }
 
