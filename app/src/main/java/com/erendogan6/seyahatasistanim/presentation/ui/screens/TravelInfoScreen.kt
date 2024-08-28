@@ -1,7 +1,6 @@
 package com.erendogan6.seyahatasistanim.presentation.ui.screens
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +25,9 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -72,14 +74,14 @@ fun travelInfoScreen(
     chatGptViewModel: ChatGptViewModel = koinViewModel(),
     weatherViewModel: WeatherViewModel = koinViewModel(),
 ) {
-    val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsState()
     val errorState by viewModel.errorState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
     var shouldNavigate by remember { mutableStateOf(false) }
 
     LaunchedEffect(errorState) {
         errorState?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            snackbarHostState.showSnackbar(it)
         }
     }
 
@@ -95,44 +97,50 @@ fun travelInfoScreen(
         shouldNavigate = true
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter,
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            contentAlignment = Alignment.TopCenter,
         ) {
-            Text(
-                text = stringResource(id = R.string.welcome_message),
-                style =
-                    MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp,
-                        letterSpacing = 1.5.sp,
-                        shadow =
-                            Shadow(
-                                color = Color(0xFF444444),
-                                offset = Offset(2f, 2f),
-                                blurRadius = 8f,
-                            ),
-                        lineHeight = 40.sp,
-                    ),
-                color = Color.Black,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 20.dp),
-            )
-
-            if (isLoading) {
-                lottieLoadingScreen()
-            } else {
-                travelForm(
-                    viewModel = viewModel,
-                    chatGptViewModel = chatGptViewModel,
-                    weatherViewModel = weatherViewModel,
-                    navController = navController,
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.welcome_message),
+                    style =
+                        MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 28.sp,
+                            letterSpacing = 1.5.sp,
+                            shadow =
+                                Shadow(
+                                    color = Color(0xFF444444),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 8f,
+                                ),
+                            lineHeight = 40.sp,
+                        ),
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 20.dp),
                 )
+
+                if (isLoading) {
+                    lottieLoadingScreen()
+                } else {
+                    travelForm(
+                        viewModel = viewModel,
+                        chatGptViewModel = chatGptViewModel,
+                        weatherViewModel = weatherViewModel,
+                        navController = navController,
+                    )
+                }
             }
         }
     }
