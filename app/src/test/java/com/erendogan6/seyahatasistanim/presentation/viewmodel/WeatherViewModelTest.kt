@@ -35,6 +35,7 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WeatherViewModelTest {
+    // Mocks and dependencies
     private lateinit var viewModel: WeatherViewModel
     private val getWeatherForecastUseCase: GetWeatherForecastUseCase = mockk()
     private val saveWeatherDataUseCase: SaveWeatherDataUseCase = mockk()
@@ -44,8 +45,7 @@ class WeatherViewModelTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher) // Set the Main dispatcher for tests
-
+        Dispatchers.setMain(testDispatcher)
         viewModel =
             WeatherViewModel(
                 getWeatherForecastUseCase,
@@ -76,19 +76,17 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should fetch data from API and save to database`() =
         runTest(testDispatcher) {
-            val singleForecast =
-                WeatherForecast(
-                    dateTime = LocalDate.now().toEpochDay() * (24 * 60 * 60),
-                    temp = Temperature(20.0, 15.0),
-                    weather = listOf(Weather("Clear")),
-                )
+            // Arrange
+            val singleForecast = createWeatherForecast()
             val weatherApiResponse = WeatherApiResponse(forecastList = listOf(singleForecast))
             coEvery { getWeatherForecastUseCase.invoke(40.0, 29.0) } returns flowOf(weatherApiResponse)
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
+            // Assert
             coVerify(exactly = 1) { getWeatherForecastUseCase.invoke(40.0, 29.0) }
             coVerify(exactly = 1) { saveWeatherDataUseCase.invoke(any()) }
             assertThat(viewModel.weatherData.value).isNotNull
@@ -98,10 +96,15 @@ class WeatherViewModelTest {
     @Test
     fun `loadWeatherFromDb should fetch weather data from database`() =
         runTest {
-            coEvery { getWeatherDataUseCase.invoke(any(), any()) } returns listOf(WeatherEntity("1", LocalDate.now(), 20.0, 15.0, "Clear"))
+            // Arrange
+            val weatherEntity = WeatherEntity("1", LocalDate.now(), 20.0, 15.0, "Clear")
+            coEvery { getWeatherDataUseCase.invoke(any(), any()) } returns listOf(weatherEntity)
 
+            // Act
             viewModel.loadWeatherFromDb(LocalDate.now(), 3)
+            advanceUntilIdle()
 
+            // Assert
             val expectedStartDate = LocalDate.now().minusDays(1)
             val expectedEndDate = LocalDate.now().plusDays(3)
 
@@ -113,15 +116,18 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should load data from database when API fails`() =
         runTest(testDispatcher) {
-            coEvery { getWeatherForecastUseCase.invoke(any(), any()) } throws Exception("Network Error")
-            coEvery { getWeatherDataUseCase.invoke(any(), any()) } returns listOf(WeatherEntity("1", LocalDate.now(), 20.0, 15.0, "Clear"))
-
+            // Arrange
             val travelDate = LocalDate.of(2024, 9, 3)
             val daysToStay = 4
+            val weatherEntity = WeatherEntity("1", LocalDate.now(), 20.0, 15.0, "Clear")
+            coEvery { getWeatherForecastUseCase.invoke(any(), any()) } throws Exception("Network Error")
+            coEvery { getWeatherDataUseCase.invoke(any(), any()) } returns listOf(weatherEntity)
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, travelDate, daysToStay)
             advanceUntilIdle()
 
+            // Assert
             val expectedStartDate = travelDate.minusDays(1)
             val expectedEndDate = travelDate.plusDays(daysToStay.toLong())
 
@@ -131,14 +137,16 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should skip API call when travel date is more than 30 days away`() =
         runTest(testDispatcher) {
+            // Arrange
             val travelDate = LocalDate.now().plusDays(35)
             val daysToStay = 4
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, travelDate, daysToStay)
             advanceUntilIdle()
 
+            // Assert
             assertThat(viewModel.weatherData.value).isNull()
-
             coVerify(exactly = 0) { getWeatherForecastUseCase.invoke(any(), any()) }
             coVerify(exactly = 0) { getWeatherDataUseCase.invoke(any(), any()) }
         }
@@ -146,11 +154,14 @@ class WeatherViewModelTest {
     @Test
     fun `loadWeatherFromDb should handle exception gracefully`() =
         runTest {
+            // Arrange
             coEvery { getWeatherDataUseCase.invoke(any(), any()) } throws Exception("Database Error")
 
+            // Act
             viewModel.loadWeatherFromDb(LocalDate.now(), 3)
             advanceUntilIdle()
 
+            // Assert
             assertThat(viewModel.weatherFromDb.value).isNull()
             coVerify(exactly = 1) { getWeatherDataUseCase.invoke(any(), any()) }
         }
@@ -158,35 +169,30 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should handle invalid input gracefully`() =
         runTest(testDispatcher) {
-            // Pass invalid coordinates
+            // Act
             viewModel.fetchWeatherData(-999.0, -999.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
+            // Assert
             assertThat(viewModel.weatherData.value).isNull()
-
             coVerify(exactly = 0) { getWeatherForecastUseCase.invoke(any(), any()) }
         }
 
     @Test
     fun `fetchWeatherData should handle daysToStay equals zero correctly`() =
         runTest(testDispatcher) {
+            // Arrange
             val travelDate = LocalDate.now()
-
-            // Mock the API response with one forecast for the travel date
-            val singleForecast =
-                WeatherForecast(
-                    dateTime = travelDate.toEpochDay() * (24 * 60 * 60),
-                    temp = Temperature(20.0, 15.0),
-                    weather = listOf(Weather("Clear")),
-                )
+            val singleForecast = createWeatherForecast()
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } returns
                 flowOf(WeatherApiResponse(forecastList = listOf(singleForecast)))
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, travelDate, 0)
             advanceUntilIdle()
 
-            // Verify that the data is correctly fetched and processed
+            // Assert
             assertThat(viewModel.weatherData.value).isNotNull()
             assertThat(viewModel.weatherData.value?.forecastList).hasSize(1)
             assertThat(
@@ -203,31 +209,16 @@ class WeatherViewModelTest {
         runTest(testDispatcher) {
             // Arrange
             val travelDate = LocalDate.now()
-            val maxDaysToStay = 30 // Assume 30 is the maximum allowed days to stay
-
-            // Mock temperature and weather data
-            val temperature = Temperature(20.0, 15.0) // Adjust as per your model structure
-            val weather = listOf(Weather("Clear")) // Adjust as per your model structure
-
-            val weatherApiResponse =
-                WeatherApiResponse(
-                    forecastList =
-                        List(maxDaysToStay + 1) { index ->
-                            WeatherForecast(
-                                dateTime = travelDate.plusDays(index.toLong()).toEpochDay() * (24 * 60 * 60),
-                                temp = temperature,
-                                weather = weather,
-                            )
-                        },
-                )
-
-            // Mock the API response and save operation
+            val maxDaysToStay = 30
+            val temperature = Temperature(20.0, 15.0)
+            val weather = listOf(Weather("Clear"))
+            val weatherApiResponse = createWeatherApiResponse(travelDate, maxDaysToStay, temperature, weather)
             coEvery { getWeatherForecastUseCase.invoke(40.0, 29.0) } returns flowOf(weatherApiResponse)
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
             // Act
             viewModel.fetchWeatherData(40.0, 29.0, travelDate, maxDaysToStay)
-            advanceUntilIdle() // Ensure all coroutines complete
+            advanceUntilIdle()
 
             // Assert
             coVerify(exactly = 1) { getWeatherForecastUseCase.invoke(40.0, 29.0) }
@@ -239,9 +230,11 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should handle negative days to stay gracefully`() =
         runTest(testDispatcher) {
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, LocalDate.now(), -5)
             advanceUntilIdle()
 
+            // Assert
             assertThat(viewModel.weatherData.value).isNull()
             coVerify(exactly = 0) { getWeatherForecastUseCase.invoke(any(), any()) }
         }
@@ -249,25 +242,31 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should handle edge coordinates correctly`() =
         runTest(testDispatcher) {
-            val weatherApiResponse = WeatherApiResponse(forecastList = listOf())
-            coEvery { getWeatherForecastUseCase.invoke(90.0, 135.0) } returns flowOf(weatherApiResponse) // North Pole
+            // Arrange
+            val weatherApiResponse = WeatherApiResponse(forecastList = emptyList())
+            coEvery { getWeatherForecastUseCase.invoke(90.0, 135.0) } returns flowOf(weatherApiResponse)
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
+            // Act
             viewModel.fetchWeatherData(90.0, 135.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
+            // Assert
             coVerify(exactly = 2) { getWeatherForecastUseCase.invoke(90.0, 135.0) }
         }
 
     @Test
     fun `fetchWeatherData should maintain state after exception`() =
         runTest(testDispatcher) {
+            // Arrange
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } throws Exception("API Error")
             coEvery { getWeatherDataUseCase.invoke(any(), any()) } returns emptyList()
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
+            // Assert
             assertThat(viewModel.weatherData.value).isNull()
             assertThat(viewModel.weatherFromDb.value).isNullOrEmpty()
         }
@@ -275,20 +274,17 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should log correct messages on success`() =
         runTest(testDispatcher) {
-            val singleForecast =
-                WeatherForecast(
-                    dateTime = LocalDate.now().toEpochDay() * (24 * 60 * 60),
-                    temp = Temperature(20.0, 15.0),
-                    weather = listOf(Weather("Clear")),
-                )
+            // Arrange
+            val singleForecast = createWeatherForecast()
             val weatherApiResponse = WeatherApiResponse(forecastList = listOf(singleForecast))
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } returns flowOf(weatherApiResponse)
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
-            // Correct the expected log message here
+            // Assert
             coVerify { Log.i("WeatherViewModel", "Weather data fetched") }
             coVerify(exactly = 1) { getWeatherForecastUseCase.invoke(any(), any()) }
             coVerify(exactly = 1) { saveWeatherDataUseCase.invoke(any()) }
@@ -297,12 +293,15 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should handle empty API response gracefully`() =
         runTest(testDispatcher) {
+            // Arrange
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } returns flowOf(WeatherApiResponse(forecastList = emptyList()))
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
+            // Assert
             assertThat(viewModel.weatherData.value).isNull()
             coVerify(exactly = 2) { getWeatherForecastUseCase.invoke(any(), any()) }
             coVerify(exactly = 0) { saveWeatherDataUseCase.invoke(any()) }
@@ -311,13 +310,14 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should handle null API response gracefully`() =
         runTest(testDispatcher) {
-            // Return a flow of null WeatherApiResponse
+            // Arrange
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } returns flowOf<WeatherApiResponse?>(null)
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
-            // Verify that the ViewModel handles the null response
+            // Assert
             assertThat(viewModel.weatherData.value).isNull()
             coVerify(exactly = 2) { getWeatherForecastUseCase.invoke(any(), any()) }
         }
@@ -355,18 +355,7 @@ class WeatherViewModelTest {
         runTest(testDispatcher) {
             // Arrange
             val travelDate = LocalDate.now()
-            val weatherApiResponse =
-                WeatherApiResponse(
-                    forecastList =
-                        listOf(
-                            WeatherForecast(
-                                dateTime = travelDate.toEpochDay() * (24 * 60 * 60),
-                                temp = Temperature(20.0, 15.0),
-                                weather = listOf(Weather("Clear")),
-                            ),
-                        ),
-                )
-
+            val weatherApiResponse = createWeatherApiResponse(travelDate, 0, Temperature(20.0, 15.0), listOf(Weather("Clear")))
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } returns flowOf(weatherApiResponse)
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
@@ -383,12 +372,15 @@ class WeatherViewModelTest {
     @Test
     fun `fetchWeatherData should handle multiple API failures and retry`() =
         runTest(testDispatcher) {
+            // Arrange
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } throws Exception("Network Error")
             coEvery { getWeatherDataUseCase.invoke(any(), any()) } returns emptyList()
 
+            // Act
             viewModel.fetchWeatherData(40.0, 29.0, LocalDate.now(), 3)
             advanceUntilIdle()
 
+            // Assert
             coVerify(exactly = 2) { getWeatherForecastUseCase.invoke(any(), any()) }
             assertThat(viewModel.weatherFromDb.value).isNullOrEmpty()
         }
@@ -397,7 +389,7 @@ class WeatherViewModelTest {
     fun `fetchWeatherData should not save invalid API data to database`() =
         runTest(testDispatcher) {
             // Arrange
-            val invalidApiResponse = WeatherApiResponse(forecastList = listOf()) // Empty data simulating an invalid response
+            val invalidApiResponse = WeatherApiResponse(forecastList = emptyList())
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } returns flowOf(invalidApiResponse)
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
@@ -407,7 +399,7 @@ class WeatherViewModelTest {
 
             // Assert
             coVerify(exactly = 2) { getWeatherForecastUseCase.invoke(any(), any()) }
-            coVerify(exactly = 0) { saveWeatherDataUseCase.invoke(any()) } // Ensure no data is saved
+            coVerify(exactly = 0) { saveWeatherDataUseCase.invoke(any()) }
         }
 
     @Test
@@ -422,9 +414,7 @@ class WeatherViewModelTest {
             advanceUntilIdle()
 
             // Assert
-            coVerify {
-                Log.e("WeatherViewModel", "Unexpected error: Network Error")
-            }
+            coVerify { Log.e("WeatherViewModel", "Unexpected error: $errorMessage") }
         }
 
     @Test
@@ -432,28 +422,57 @@ class WeatherViewModelTest {
         runTest(testDispatcher) {
             // Arrange
             val travelDate = LocalDate.now()
-            val largeDataSet =
-                List(1000) { index ->
-                    // Simulate large data set
-                    WeatherForecast(
-                        dateTime = travelDate.plusDays(index.toLong()).toEpochDay() * (24 * 60 * 60),
-                        temp = Temperature(20.0, 15.0),
-                        weather = listOf(Weather("Clear")),
-                    )
-                }
-
+            val largeDataSet = createLargeWeatherForecastList(travelDate, 1000)
             val weatherApiResponse = WeatherApiResponse(forecastList = largeDataSet)
             coEvery { getWeatherForecastUseCase.invoke(any(), any()) } returns flowOf(weatherApiResponse)
             coEvery { saveWeatherDataUseCase.invoke(any()) } just Runs
 
             // Act
-            viewModel.fetchWeatherData(40.0, 29.0, travelDate, 30) // Assuming 30 is the max days to stay
+            viewModel.fetchWeatherData(40.0, 29.0, travelDate, 30)
             advanceUntilIdle()
 
             // Assert
             assertThat(viewModel.weatherData.value?.forecastList).hasSize(31)
             coVerify(exactly = 1) { getWeatherForecastUseCase.invoke(any(), any()) }
         }
+
+    // Helper functions
+    private fun createLargeWeatherForecastList(
+        startDate: LocalDate,
+        count: Int,
+    ): List<WeatherForecast> =
+        List(count) { index ->
+            WeatherForecast(
+                dateTime = startDate.plusDays(index.toLong()).toEpochDay() * (24 * 60 * 60),
+                temp = Temperature(20.0, 15.0),
+                weather = listOf(Weather("Clear")),
+            )
+        }
+
+    // Helper functions
+    private fun createWeatherForecast(): WeatherForecast =
+        WeatherForecast(
+            dateTime = LocalDate.now().toEpochDay() * (24 * 60 * 60),
+            temp = Temperature(20.0, 15.0),
+            weather = listOf(Weather("Clear")),
+        )
+
+    private fun createWeatherApiResponse(
+        travelDate: LocalDate,
+        days: Int,
+        temperature: Temperature,
+        weather: List<Weather>,
+    ): WeatherApiResponse =
+        WeatherApiResponse(
+            forecastList =
+                List(days + 1) { index ->
+                    WeatherForecast(
+                        dateTime = travelDate.plusDays(index.toLong()).toEpochDay() * (24 * 60 * 60),
+                        temp = temperature,
+                        weather = weather,
+                    )
+                },
+        )
 
     @After
     fun tearDown() {
