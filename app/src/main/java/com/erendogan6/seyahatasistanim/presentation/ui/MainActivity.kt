@@ -14,8 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.erendogan6.seyahatasistanim.presentation.theme.seyahatAsistanimTheme
+import com.erendogan6.seyahatasistanim.presentation.ui.components.appNavigation
 import com.erendogan6.seyahatasistanim.presentation.ui.components.lottieLoadingScreen
-import com.erendogan6.seyahatasistanim.presentation.ui.screens.appNavigation
 import com.erendogan6.seyahatasistanim.presentation.viewmodel.TravelViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel

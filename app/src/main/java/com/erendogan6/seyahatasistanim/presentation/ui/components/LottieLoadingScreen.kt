@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -26,7 +27,7 @@ fun lottieLoadingScreen(modifier: Modifier = Modifier) {
     Log.d(stringResource(id = R.string.lottie_log_tag), stringResource(id = R.string.loading_animation_requested))
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().testTag("lottieLoadingScreen"),
         contentAlignment = Alignment.Center,
     ) {
         if (composition != null) {

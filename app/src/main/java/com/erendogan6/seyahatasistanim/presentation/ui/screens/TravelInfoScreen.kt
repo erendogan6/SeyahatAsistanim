@@ -49,6 +49,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -74,8 +75,8 @@ fun travelInfoScreen(
     chatGptViewModel: ChatGptViewModel = koinViewModel(),
     weatherViewModel: WeatherViewModel = koinViewModel(),
 ) {
-    val isLoading by viewModel.isLoading.collectAsState()
-    val errorState by viewModel.errorState.collectAsState()
+    val isLoading: Boolean by viewModel.isLoading.collectAsState()
+    val errorState: String? by viewModel.errorState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var shouldNavigate by remember { mutableStateOf(false) }
 
@@ -222,6 +223,7 @@ fun travelForm(
                     },
                     label = stringResource(id = R.string.departure_date),
                     modifier = Modifier.fillMaxWidth(),
+                    testTag = "DepartureDatePicker",
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -259,6 +261,7 @@ fun travelForm(
                     },
                     label = stringResource(id = R.string.arrival_date),
                     modifier = Modifier.fillMaxWidth(),
+                    testTag = "ArrivalDatePicker",
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -312,7 +315,8 @@ fun travelForm(
                             .height(
                                 56.dp,
                             ).shadow(2.dp, RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
+                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                            .testTag("DaysToStayTextField"),
                     colors =
                         TextFieldDefaults.colors(
                             focusedIndicatorColor = Color.Transparent,
@@ -391,6 +395,7 @@ fun datePickerField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    testTag: String,
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
@@ -398,6 +403,7 @@ fun datePickerField(
     Box(
         modifier =
             modifier
+                .testTag(testTag)
                 .fillMaxWidth()
                 .height(
                     56.dp,
@@ -406,23 +412,17 @@ fun datePickerField(
                 .clickable {
                     showDialog =
                         true
-                },
+                }.testTag("DatePickerBox"),
     ) {
-        if (value.isEmpty()) {
-            Text(
-                text = label,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp),
-            )
-        } else {
-            Text(
-                text = value,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp),
-            )
-        }
+        Text(
+            text = if (value.isEmpty()) label else value,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (value.isEmpty()) 0.8f else 1f),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier =
+                Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 16.dp),
+        )
     }
 
     if (showDialog) {
@@ -447,7 +447,7 @@ fun datePickerField(
                 }
             },
         ) {
-            DatePicker(state = datePickerState)
+            DatePicker(state = datePickerState, modifier = Modifier.testTag("DatePicker"))
         }
     }
 }

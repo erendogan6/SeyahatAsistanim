@@ -139,4 +139,5 @@
     <string name="error_departure_date_later">Departure date cannot be later than arrival date.</string>
     <string name="error_invalid_date_format">Invalid date format.</string>
     <string name="no_internet_connection">No internet connection. Please check your network settings and try again.</string>
+    <string name="invalid_coordinates">Invalid Coordinates</string>
 </resources>

@@ -1,10 +1,16 @@
-package com.erendogan6.seyahatasistanim.presentation.ui.screens
+package com.erendogan6.seyahatasistanim.presentation.ui.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.erendogan6.seyahatasistanim.presentation.ui.screens.chatGptScreen
+import com.erendogan6.seyahatasistanim.presentation.ui.screens.checklistScreen
+import com.erendogan6.seyahatasistanim.presentation.ui.screens.homeScreen
+import com.erendogan6.seyahatasistanim.presentation.ui.screens.localInfoScreen
+import com.erendogan6.seyahatasistanim.presentation.ui.screens.travelInfoScreen
+import com.erendogan6.seyahatasistanim.presentation.ui.screens.weatherDetailScreen
 
 @Composable
 fun appNavigation(

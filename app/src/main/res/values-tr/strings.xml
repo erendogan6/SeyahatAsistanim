@@ -139,4 +139,5 @@
     <string name="error_departure_date_later">Kalkış tarihi, varış tarihinden sonra olamaz.</string>
     <string name="error_invalid_date_format">Geçersiz tarih formatı.</string>
     <string name="no_internet_connection">İnternet bağlantısı yok. Lütfen ağ ayarlarınızı kontrol edin ve tekrar deneyin.</string>
+    <string name="invalid_coordinates">Geçersiz Kordinatlar</string>
 </resources>
