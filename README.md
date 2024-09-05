@@ -1,15 +1,15 @@
 # Seyahat Asistanım
 
- <img src="https://i.hizliresim.com/d5ixyhx.png" width="250" height="250">
+ <img src="https://i.hizliresim.com/d5ixyhx.png" width="230" height="230">
 
 ## Proje Hakkında
 **Seyahat Asistanım**, seyahat planlarınızı zahmetsizce organize etmenize yardımcı olan, yapay zeka destekli yenilikçi bir mobil uygulamadır. Kullanıcılar, uygulama üzerinden seyahat bilgilerini girdikten sonra, varış noktalarına dair hava durumu tahminleri, kişiselleştirilmiş kontrol listeleri ve yerel öneriler gibi detaylı bilgilere kolayca erişebilirler.
 
 Seyahat Asistanım, OpenAI’nin ChatGPT-4O modelini kullanmaktadır.
 
-## Kullanım Videosu
+## Kullanım Videosu İçin Görsele Tıklayın
 
-<a href="https://www.youtube.com/shorts/lgvJ-na1mtU?si=A2Is9vkUwP2Ap1fd"> <img src="https://i.hizliresim.com/o59t6g4.png" alt="Seyahat Asistanım Kullanım Videosu" width="320" height="680">  </a> 
+<a href="https://www.youtube.com/shorts/lgvJ-na1mtU?si=A2Is9vkUwP2Ap1fd"> <img src="https://i.hizliresim.com/o59t6g4.png" alt="Seyahat Asistanım Kullanım Videosu" width="310" height="660">  </a> 
 
 ## Özellikler
 
@@ -39,6 +39,17 @@ Seyahat Asistanım, OpenAI’nin ChatGPT-4O modelini kullanmaktadır.
 - **OpenWeather API**
 - **Ktlint** (Code Style)
 - **Material Design**
+
+## Test Yığını (Test Stack)
+- **JUnit** (Unit Testing)
+- **MockK** (Mocking Framework)
+- **Kotlin Coroutines Test** (Testing Coroutines)
+- **Androidx UI Test Manifest** (UI Testing)
+- **Arch Core Testing** (Architecture Component Testing)
+- **AndroidX Test Runner** (Instrumented Testing)
+- **Kover** (Code Coverage)
+- **Espresso** (UI Testing Framework)
+- **AssertJ** (Fluent Assertions)
 
 ## Yaklaşımlar (Approaches)
 - **%100 Localization** (Türkçe, İngilizce)
