@@ -232,7 +232,7 @@ fun travelForm(
                     value = departurePlace,
                     onValueChange = {
                         departurePlace = it
-                        viewModel.fetchDepartureCitySuggestions(it)
+                        viewModel.fetchCitySuggestions(it, true)
                     },
                     label = stringResource(id = R.string.departure_place),
                     citySuggestions = (departureCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
@@ -270,7 +270,7 @@ fun travelForm(
                     value = arrivalPlace,
                     onValueChange = {
                         arrivalPlace = it
-                        viewModel.fetchArrivalCitySuggestions(it)
+                        viewModel.fetchCitySuggestions(it, false)
                     },
                     label = stringResource(id = R.string.arrival_place),
                     citySuggestions = (arrivalCityLoadingState as? TravelViewModel.LoadingState.Loaded)?.data ?: emptyList(),
