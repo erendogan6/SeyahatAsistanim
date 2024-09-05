@@ -10,5 +10,5 @@ class GetWeatherForecastUseCase(
     operator fun invoke(
         lat: Double,
         lon: Double,
-    ): Flow<WeatherApiResponse> = weatherRepository.getWeatherForecast(lat, lon)
+    ): Flow<WeatherApiResponse?> = weatherRepository.getWeatherForecast(lat, lon)
 }

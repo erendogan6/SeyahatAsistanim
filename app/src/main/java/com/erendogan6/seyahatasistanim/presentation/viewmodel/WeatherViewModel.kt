@@ -37,9 +37,20 @@ class WeatherViewModel(
         travelDate: LocalDate,
         daysToStay: Int,
     ) {
+        if (daysToStay < 0) {
+            _weatherData.value = null
+            Log.w("WeatherViewModel", "Invalid days to stay: $daysToStay. Skipping API call.")
+            return
+        }
+
+        if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+            Log.e("WeatherViewModel", context.getString(R.string.invalid_coordinates))
+            return
+        }
+
         val today = LocalDate.now()
         val startDate = travelDate.minusDays(1)
-        val endDate = travelDate.plusDays(daysToStay.toLong())
+        val endDate = if (daysToStay == 0) travelDate else travelDate.plusDays(daysToStay.toLong())
 
         val daysDifference = ChronoUnit.DAYS.between(today, startDate).toInt()
         if (daysDifference > 30) {
@@ -49,28 +60,61 @@ class WeatherViewModel(
         }
 
         viewModelScope.launch {
-            Log.i(
-                "WeatherViewModel",
-                context.getString(R.string.fetching_weather_data, lat.toString(), lon.toString(), startDate.toString()),
-            )
+            var retries = 0
+            var dataFetched = false
 
-            getWeatherForecastUseCase(lat, lon)
-                .catch { error ->
-                    Log.e("WeatherViewModel", context.getString(R.string.error_fetching_weather_data_api, error.message ?: "Unknown Error"))
-                    loadWeatherFromDb(travelDate, daysToStay)
-                }.collect { data ->
-                    val filteredForecasts =
-                        data.forecastList
-                            .filter { forecast ->
-                                val forecastDate = LocalDate.ofEpochDay(forecast.dateTime / (24 * 60 * 60))
-                                !forecastDate.isBefore(startDate) && !forecastDate.isAfter(endDate)
-                            }.take(daysToStay + 1)
+            while (retries < 2 && !dataFetched) {
+                try {
+                    Log.i(
+                        "WeatherViewModel",
+                        context.getString(R.string.fetching_weather_data, lat.toString(), lon.toString(), startDate.toString()),
+                    )
 
-                    val limitedData = data.copy(forecastList = filteredForecasts)
-                    saveWeatherDataToDb(limitedData)
-                    _weatherData.value = limitedData
-                    Log.i("WeatherViewModel", context.getString(R.string.weather_data_fetched))
+                    getWeatherForecastUseCase(lat, lon)
+                        .catch { error ->
+                            Log.e(
+                                "WeatherViewModel",
+                                context.getString(
+                                    R.string.error_fetching_weather_data_api,
+                                    error.message ?: "Unknown Error",
+                                ),
+                            )
+                            retries++
+                            if (retries >= 2) {
+                                loadWeatherFromDb(travelDate, daysToStay)
+                            }
+                        }.collect { data ->
+                            val filteredForecasts =
+                                data
+                                    ?.forecastList
+                                    ?.filter { forecast ->
+                                        val forecastDate = LocalDate.ofEpochDay(forecast.dateTime / (24 * 60 * 60))
+                                        !forecastDate.isBefore(startDate) && !forecastDate.isAfter(endDate)
+                                    }?.take(if (daysToStay == 0) 1 else daysToStay + 1)
+
+                            if (!filteredForecasts.isNullOrEmpty()) {
+                                val limitedData = data.copy(forecastList = filteredForecasts)
+                                saveWeatherDataToDb(limitedData)
+                                _weatherData.value = limitedData
+                                Log.i("WeatherViewModel", context.getString(R.string.weather_data_fetched))
+                                dataFetched = true
+                            } else {
+                                _weatherData.value = null
+                                Log.w("WeatherViewModel", "Empty or invalid data received from API. Retrying...")
+                                retries++
+                                if (retries >= 2) {
+                                    loadWeatherFromDb(travelDate, daysToStay)
+                                }
+                            }
+                        }
+                } catch (e: Exception) {
+                    Log.e("WeatherViewModel", "Unexpected error: ${e.message}")
+                    retries++
+                    if (retries >= 2) {
+                        loadWeatherFromDb(travelDate, daysToStay)
+                    }
                 }
+            }
         }
     }
 
